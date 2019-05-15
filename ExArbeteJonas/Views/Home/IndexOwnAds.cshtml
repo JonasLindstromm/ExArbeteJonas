@@ -1,0 +1,55 @@
+﻿@model ExArbeteJonas.ViewModels.AdsViewModel
+
+@if (Model.CurrentAds.Count() == 0)
+{
+    <h2 class="ice-two">Inga egna annonser</h2>
+}
+else
+{
+    <h2 class="ice-two">Mina annonser</h2>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    Annonstyp
+                </th>               
+                <th>
+                    Annonsrubrik
+                </th>
+                <th>
+                    Inlagd, datum
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+        <tbody>
+            @foreach (var item in Model.CurrentAds)
+            {
+                <tr>
+                    <td>
+                        @item.AdvType.Name
+                    </td>                    
+                    <td>
+                        @item.Title
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.StartDate)
+                    </td>
+                    <td>
+                        <a asp-action="DeleteOwnAdv" asp-route-id="@item.Id">Ta bort annonsen | </a>
+                        <a asp-action="DetailsAdv" asp-route-id="@item.Id">Visa hela annonsen</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@{
+    ViewData["Title"] = "IndexOwnAds";
+}
+
+
+

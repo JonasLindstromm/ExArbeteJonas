@@ -1,0 +1,36 @@
+﻿@model ExArbeteJonas.ViewModels.TypesViewModel
+
+<h2 class="ice-two">Administration av Annonstyper och Utrustningstyper</h2>
+<br />
+<div class="container">
+    <div class="col-md-6" align="center">
+        <h3 class="ice-three">Annonstyper</h3>
+        <ul>
+            @foreach (var item in Model.AdTypeNames)
+            {
+                <li>@item</li>
+            }
+        </ul>
+        <br />
+        <a asp-action="CreateAdType">Registrera ny Annonstyp</a>
+    </div>
+    <div class="col-md-6" align="center">
+        <h3 class="ice-three">Utrustningstyper</h3>
+        <ul>
+            @foreach (var item in Model.EquipmentTypeNames)
+            {
+                <li>@item</li>
+            }
+        </ul>
+        <br />
+        <a asp-action="CreateEquipmentType">Registrera ny Utrustningstyp</a>
+    </div>
+</div>
+<br />
+
+
+
+
+
+
+

@@ -1,6 +1,6 @@
 using System;
 
-namespace ExArbeteJonas.Models
+namespace ExArbeteJonas.ViewModels
 {
     public class ErrorViewModel
     {

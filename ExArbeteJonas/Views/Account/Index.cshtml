@@ -1,0 +1,105 @@
+﻿@model IEnumerable<ExArbeteJonas.ViewModels.UserViewModel>
+
+<br />
+
+<div class="col-md-4 col-md-offset-4" align="center">
+
+    <a asp-action="RegisterAdmin">Registrera ny Administratör</a>
+</div>
+<br />
+@{ var admins = Model.Where(i => i.RollNamn == "Admin");
+    if (admins.Count() > 0)
+    {
+        <h2 class="ice-two">Alla registrerade Administratörer</h2>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>
+                        Namn
+                    </th>
+                    <th>
+                        Användarnamn
+                    </th>
+                    <th>
+                        Email
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in admins)
+                {
+                    <tr>
+                        <td>
+                            @item.Namn
+                        </td>
+                        <td>
+                            @item.AnvandarNamn
+                        </td>
+                        <td>
+                            @item.Email
+                        </td>
+                        <td>
+                            @if (item.AnvandarNamn != User.Identity.Name)
+                            {
+                                <a asp-action="Unregister" asp-route-id="@item.Id">Avregistrera Administratör</a>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <h2 class="ice-two">Inga registrerade Administratörer</h2>
+    }
+}
+
+@{ var members = Model.Where(i => i.RollNamn == "Member");
+    if (members.Count() > 0)
+    {
+        <h2 class="ice-two">Alla registrerade Medlemmar</h2>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>
+                        Namn
+                    </th>
+                    <th>
+                        Användarnamn
+                    </th>
+                    <th>
+                        Email
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in members)
+                {
+                    <tr>
+                        <td>
+                            @item.Namn
+                        </td>
+                        <td>
+                            @item.AnvandarNamn
+                        </td>
+                        <td>
+                            @item.Email
+                        </td>
+                        <td>
+                            <a asp-action="Unregister" asp-route-id="@item.Id">Avregistrera Medlem</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <h2 class="ice-two">Inga registrerade Medlemmar</h2>
+    }
+}
+</ br>
+

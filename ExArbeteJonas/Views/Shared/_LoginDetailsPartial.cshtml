@@ -1,0 +1,36 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using ExArbeteJonas.IdentityData
+
+<!--Injectar identity tjänsten i vyn-->
+@inject UserManager<ApplicationUser> userManager
+@inject SignInManager<ApplicationUser> signInManager
+<!--Om användaren är inloggad-->
+@if (signInManager.IsSignedIn(User))
+{
+<ul class="nav navbar-nav">
+    <li><a asp-area="" asp-controller="Home" asp-action="IndexAds">Alla annonser</a></li>
+    <li><a asp-area="" asp-controller="Home" asp-action="SearchAds">Sök annonser</a></li>
+    @if (User.IsInRole("Member"))
+    {
+        <li><a asp-area="" asp-controller="Home" asp-action="IndexOwnAds">Mina annonser</a></li>
+        <li><a asp-area="" asp-controller="Home" asp-action="CreateAdv">Lägg in annons</a></li>
+        <li><a>@userManager.GetUserName(User) inloggad som Medlem</a></li>
+    }
+    @if (User.IsInRole("Admin"))
+    {
+        <li><a asp-area="" asp-controller="Account" asp-action="Index">Behörighetsadm</a></li>
+        <li><a asp-area="" asp-controller="Home" asp-action="IndexTypes">Adm</a></li>
+        <li><a>@userManager.GetUserName(User) inloggad som Administratör</a></li>
+    }
+    <li><a asp-area="" asp-controller="Account" asp-action="Logout">Logga Ut</a></li>
+</ul>
+}
+else
+{
+    <ul class="nav navbar-nav">
+        <li><a asp-area="" asp-controller="Home" asp-action="IndexAds">Alla annonser</a></li>
+        <li><a asp-area="" asp-controller="Home" asp-action="SearchAds">Sök annonser</a></li>
+        <li><a asp-area="" asp-controller="Account" asp-action="Login">Logga in</a></li>
+        <li><a asp-area="" asp-controller="Account" asp-action="Register">Registrera Medlem</a></li>
+    </ul>
+}

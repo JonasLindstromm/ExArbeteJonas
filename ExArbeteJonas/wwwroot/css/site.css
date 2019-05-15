@@ -35,3 +35,41 @@ body {
         display: none;
     }
 }
+
+.navbar-default .navbar-toggle .icon-bar {
+    background-color: black;
+    color: white;
+}
+
+h1.ice-one {
+    color: aqua;
+    text-align: center
+}
+
+h2.ice-two {
+    color: blue;
+    text-align: center
+}
+
+h2.red-two {
+    color: red;
+    text-align: center
+}
+
+h3.ice-three {
+    color: lightblue;
+    text-align: center
+}
+
+ul {
+    list-style-type: none;
+    color: royalblue;
+    text-align: center;
+    padding: 0
+}
+
+#bottom {
+    color: white;
+    padding: 15px;
+    text-align: center;
+}
