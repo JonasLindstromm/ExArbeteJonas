@@ -1,8 +1,12 @@
 ﻿using ExArbeteJonas.DataLayer;
 using ExArbeteJonas.Models;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Mail;
 using System.Threading.Tasks;
 
 namespace ExArbeteJonas.BusinessLayer
@@ -10,11 +14,15 @@ namespace ExArbeteJonas.BusinessLayer
     public class MarketBusiness : IMarketBusiness
     {
         private IMarketData _marketData;
+        private IHostingEnvironment _environment;
+        private readonly IConfiguration _config;
 
         //Dependency Injection via konstruktorn
-        public MarketBusiness(IMarketData marketData)
+        public MarketBusiness(IMarketData marketData, IHostingEnvironment environment, IConfiguration config)
         {
             _marketData = marketData;
+            _environment = environment;
+            _config = config;
         }
 
         // Skapa en Annonstyp
@@ -177,6 +185,46 @@ namespace ExArbeteJonas.BusinessLayer
             }
 
             return searchedAds;
+        }
+
+        public void SendEmail(string mailSubject, string mailText, string receiver)
+        {
+            SmtpClient client;
+            string host = _config.GetValue<String>("Email:Smtp:Host");
+            int port = _config.GetValue<int>("Email:Smtp:Port");
+
+            if (_environment.IsProduction())
+            {
+                client = new SmtpClient()
+                {
+                    Host = host,
+                    Port = port,
+                    Credentials = new NetworkCredential(
+                     _config.GetValue<String>("Email:Smtp:ProdUsername"),
+                     _config.GetValue<String>("Email:Smtp:ProdPassword")
+                 ),
+                    EnableSsl = true
+                };
+            }
+            else
+            {
+                client = new SmtpClient()
+                {
+                    Host = host,
+                    Port = port,
+                    Credentials = new NetworkCredential(
+                        _config.GetValue<String>("Email:Smtp:Username"),
+                        _config.GetValue<String>("Email:Smtp:Password")
+                    ),
+                    EnableSsl = true
+                };
+            }
+
+            string sender = _config.GetValue<string>("SiteName") + "@nackademin.se";
+
+            // from, to, subject, text
+            client.Send(sender, receiver, mailSubject, mailText);
+
         }
     }
 }

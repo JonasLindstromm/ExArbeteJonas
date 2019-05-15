@@ -11,6 +11,10 @@ using ExArbeteJonas.IdentityData;
 using ExArbeteJonas.Models;
 using ExArbeteJonas.ViewModels;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Net.Mail;
+using System.Net;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 
 namespace ExArbeteJonas.Controllers
 {
@@ -18,14 +22,14 @@ namespace ExArbeteJonas.Controllers
     {
         private readonly Microsoft.AspNetCore.Identity.UserManager<ApplicationUser> _userManager;
         private readonly Microsoft.AspNetCore.Identity.SignInManager<ApplicationUser> _signInManager;
-        private readonly IMarketBusiness _businessLayer;
+        private readonly IMarketBusiness _businessLayer;       
 
         //Dependency Injection via konstruktorn
         public HomeController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IMarketBusiness businessLayer)
         {
             _userManager = userManager;
             _signInManager = signInManager;
-            _businessLayer = businessLayer;
+            _businessLayer = businessLayer;         
         }
 
         // Lägg till ny AnnonsTyp
@@ -170,7 +174,7 @@ namespace ExArbeteJonas.Controllers
                     AddError(result);
                 }
             }
-          
+
             viewModel.CurrentAdv = _businessLayer.GetAdv(viewModel.CurrentAdvId);
             viewModel.ExistingEqm = _businessLayer.GetEquipment(viewModel.CurrentAdvId);
             var eqTypes = _businessLayer.GetEquipmentTypes();
@@ -179,7 +183,7 @@ namespace ExArbeteJonas.Controllers
             {
                 viewModel.EqTypeNames.Add(new SelectListItem { Text = eqType.Name, Value = eqType.Id.ToString() });
             }
-           
+
             return View(viewModel);
         }
 
@@ -352,6 +356,91 @@ namespace ExArbeteJonas.Controllers
             return View(allTypes);
         }
 
+        // Skicka Epost till Annonsör
+        public IActionResult SendMsg(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            SendEmailViewModel viewModel = new SendEmailViewModel();
+            viewModel.AdvId = (int)id;
+
+            Advertisement adv = _businessLayer.GetAdv((int)id);
+
+            viewModel.AdvTitle = adv.Title;
+            viewModel.AdvTypeName = adv.AdvType.Name;
+            viewModel.UserName = adv.Member.UserName;
+
+            return View(viewModel);
+        }
+
+        // Skicka Epost till annonsör
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult SendMsg(SendEmailViewModel viewModel)
+        {
+            Advertisement adv = _businessLayer.GetAdv(viewModel.AdvId);
+
+            if (ModelState.IsValid)
+            {
+                _businessLayer.SendEmail(viewModel.Subject, viewModel.Message, adv.Member.Email);
+                /*
+                string mailSubject = viewModel.Subject;
+                string mailText = viewModel.Message;
+              
+                SmtpClient client;
+                string host = _config.GetValue<String>("Email:Smtp:Host");
+                int port = _config.GetValue<int>("Email:Smtp:Port");
+
+                if (_environment.IsProduction())
+                {
+                    client = new SmtpClient()
+                    {
+                        Host = host,
+                        Port = port,
+                        Credentials = new NetworkCredential(
+                         _config.GetValue<String>("Email:Smtp:ProdUsername"),
+                         _config.GetValue<String>("Email:Smtp:ProdPassword")
+                     ),
+                        EnableSsl = true
+                    };
+                }
+                else
+                {
+                    client = new SmtpClient()
+                    {
+                        Host = host,
+                        Port = port,
+                        Credentials = new NetworkCredential(
+                            _config.GetValue<String>("Email:Smtp:Username"),
+                            _config.GetValue<String>("Email:Smtp:Password")
+                        ),
+                        EnableSsl = true
+                    };
+                }
+
+                string sender = _config.GetValue<string>("SiteName") + "@nackademin.se";
+               
+                string receiver = adv.Member.Email; 
+
+                // from, to, subject, text
+                client.Send(sender, receiver, mailSubject, mailText);
+
+
+    */
+                return RedirectToAction("DetailsAdv", new { id = adv.Id });
+            }
+
+            viewModel.AdvTitle = adv.Title;
+            viewModel.AdvTypeName = adv.AdvType.Name;
+            viewModel.UserName = adv.Member.UserName;
+
+
+            return View(viewModel);
+        }
+
         // Sök annonser       
         public IActionResult SearchAds()
         {
@@ -380,7 +469,7 @@ namespace ExArbeteJonas.Controllers
         public IActionResult SearchAds(SearchAdsViewModel vM)
         {
             if (ModelState.IsValid)
-            {                
+            {
                 // För gamla annonser ska tas bort 
                 // Begär att Businesslagret gör detta
                 _businessLayer.DeleteOldAds();
