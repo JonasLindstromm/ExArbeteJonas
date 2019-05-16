@@ -42,7 +42,7 @@
                         <td>
                             @if (item.AnvandarNamn != User.Identity.Name)
                             {
-                                <a asp-action="Unregister" asp-route-id="@item.Id">Avregistrera Administratör</a>
+                                <a asp-action="Delete" asp-route-id="@item.Id">Avregistrera Administratör</a>
                             }
                         </td>
                     </tr>
@@ -89,7 +89,7 @@
                             @item.Email
                         </td>
                         <td>
-                            <a asp-action="Unregister" asp-route-id="@item.Id">Avregistrera Medlem</a>
+                            <a asp-action="Delete" asp-route-id="@item.Id">Avregistrera Medlem</a>
                         </td>
                     </tr>
                 }

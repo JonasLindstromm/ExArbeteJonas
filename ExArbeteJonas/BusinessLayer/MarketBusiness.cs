@@ -81,10 +81,22 @@ namespace ExArbeteJonas.BusinessLayer
             _marketData.DeleteAdv(adv);
         }
 
-        // Ta bort gamla annonser, som är äldre än 1 månad
+        // Ta bort alla annonser, som lagts in av en viss Medlem
+        public void DeleteMemberAds(string memberId)
+        {
+            var memberAds = _marketData.GetCurrentAds().Where(a => a.MemberId == memberId);
+
+            foreach (var adv in memberAds)
+            {
+                _marketData.DeleteAdv(adv);
+            }
+        }
+
+        // Ta bort alla annonser, som är äldre än 1 månad
         public void DeleteOldAds()
         {
-            var currentAds = _marketData.GetCurrentAds();
+            var currentAds = _marketData.GetCurrentAds();          
+
             var oldAds = currentAds.Where(a => (a.StartDate < DateTime.Now.AddMonths(-1)));
             foreach (var adv in oldAds)
             {
@@ -187,6 +199,7 @@ namespace ExArbeteJonas.BusinessLayer
             return searchedAds;
         }
 
+        // Skicka Email
         public void SendEmail(string mailSubject, string mailText, string receiver)
         {
             SmtpClient client;

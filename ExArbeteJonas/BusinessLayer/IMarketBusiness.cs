@@ -12,6 +12,7 @@ namespace ExArbeteJonas.BusinessLayer
         string CreateAdType(AdType adType);        
         string CreateEquipmentType(EquipmentType eqType);
         void DeleteAdv(Advertisement adv);
+        void DeleteMemberAds(string memberId);
         List<Advertisement> GetCurrentAds();
         Advertisement GetAdv(int id);
         List<string> GetAdvTypeNames();
@@ -23,6 +24,6 @@ namespace ExArbeteJonas.BusinessLayer
         void DeleteOldAds();
         string CreateEqm(Equipment eqm);
         List<Advertisement> SearchCurrentAds(int advTypeId, int eqTypeId, string searchTitle, string searchDescription, string searchPlace);
-        void SendEmail(string mailSubject, string mailText, string receiver);
+        void SendEmail(string mailSubject, string mailText, string receiver);       
     }
 }

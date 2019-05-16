@@ -1,4 +1,5 @@
-﻿using ExArbeteJonas.IdentityData;
+﻿using ExArbeteJonas.BusinessLayer;
+using ExArbeteJonas.IdentityData;
 using ExArbeteJonas.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -15,15 +16,139 @@ namespace ExArbeteJonas.Controllers
     {
         private readonly Microsoft.AspNetCore.Identity.UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly IMarketBusiness _businessLayer;
 
         //Dependency Injection via konstruktorn
         public AccountController(
             UserManager<ApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager
+            SignInManager<ApplicationUser> signInManager,
+            IMarketBusiness businessLayer
         )
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _businessLayer = businessLayer;
+        }
+
+        // Ta bort Medlem eller Administratör       
+        public async Task<IActionResult> Delete(string id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            ApplicationUser user = await _userManager.FindByIdAsync(id);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            UserViewModel viewModel = new UserViewModel();
+            viewModel.AnvandarNamn = user.UserName;
+            viewModel.Id = user.Id;
+
+            return View(viewModel);
+        }
+
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(string id)
+        {
+            ApplicationUser user = await _userManager.FindByIdAsync(id);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            // Om inloggad användare är Medlem
+            if (User.IsInRole("Member"))
+            {
+                // Ta bort alla annonser som lagts in av Medlemmen
+                _businessLayer.DeleteMemberAds(id);
+
+                // Logga ut Medlemmen
+                await _signInManager.SignOutAsync();
+
+                // Ta bort Medlemmen från Databasen
+                await _userManager.DeleteAsync(user);
+
+                // Visa startsidan
+                return RedirectToAction("Index", "Home");
+            }
+
+            // Om inloggad användare är Administratör
+            if (User.IsInRole("Admin"))
+            {
+                // Kontrollera så att jag inte tar bort inloggad Administratör 
+                if (user.UserName != User.Identity.Name)
+                {
+                    // Ta bort alla annonser som lagts in av Medlemmen
+                    _businessLayer.DeleteMemberAds(id);
+
+                    // Ta bort Medlemmen från Databasen
+                    await _userManager.DeleteAsync(user);
+                }
+
+                return RedirectToAction("Index");
+            }
+
+            // Visa sidan som visar alla annonser
+            return RedirectToAction("IndexAds", "Home");
+        }
+
+        //Ändra uppgifter för Medlem eller Administratör         
+        public async Task<IActionResult> Edit(string id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            ApplicationUser user = await _userManager.FindByIdAsync(id);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            EditUserViewModel viewModel = new EditUserViewModel();
+            viewModel.UserName = user.UserName;
+            viewModel.Id = user.Id;
+            viewModel.Name = user.Name;
+            viewModel.Email = user.Email;
+            viewModel.Phone = user.PhoneNumber;
+
+            return View(viewModel);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(string id, EditUserViewModel viewModel)
+        {
+            if (id != viewModel.Id)
+            {
+                return NotFound();
+            }
+
+            ApplicationUser user = await _userManager.FindByIdAsync(id);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            user.Name = viewModel.Name;
+            user.Email = viewModel.Email;
+            user.PhoneNumber = viewModel.Phone;
+
+            IdentityResult result = await _userManager.UpdateAsync(user);
+            if (result.Succeeded)
+            {
+                return RedirectToAction("IndexAds", "Home");
+            }
+
+            AddErrors(result);
+
+            return View(viewModel);
         }
 
         // Visa alla användare
@@ -108,7 +233,7 @@ namespace ExArbeteJonas.Controllers
             return View();
         }
 
-        // Registrera ny Admin 
+        // Registrera ny Administratör 
         [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -177,7 +302,8 @@ namespace ExArbeteJonas.Controllers
                 if (result.Succeeded)
                 {
                     await _signInManager.SignInAsync(user, isPersistent: false);
-                    return RedirectToAction("Index", "Home");
+
+                    return RedirectToAction("IndexAds", "Home");
                 }
                 AddErrors(result);
             }
@@ -185,6 +311,7 @@ namespace ExArbeteJonas.Controllers
             return View(regUser);
         }
 
+        /*
         //Avregistrera en Administratör eller Medlem      
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Unregister(string id)
@@ -209,6 +336,7 @@ namespace ExArbeteJonas.Controllers
 
             return RedirectToAction("Index");
         }
+        */
 
         // Visa alla fel som har med Identity att göra
         private void AddErrors(IdentityResult result)
