@@ -331,6 +331,12 @@ namespace ExArbeteJonas.Controllers
             return View(viewModel);
         }
 
+        // Visa sidan med Regler för Prylmarknaden      
+        public IActionResult IndexRules()
+        {
+            return View();
+        }
+
         // Visa alla egna annonser   
         [Authorize(Roles = "Member")]
         public async Task<IActionResult> IndexOwnAds()
@@ -386,50 +392,7 @@ namespace ExArbeteJonas.Controllers
             if (ModelState.IsValid)
             {
                 _businessLayer.SendEmail(viewModel.Subject, viewModel.Message, adv.Member.Email);
-                /*
-                string mailSubject = viewModel.Subject;
-                string mailText = viewModel.Message;
-              
-                SmtpClient client;
-                string host = _config.GetValue<String>("Email:Smtp:Host");
-                int port = _config.GetValue<int>("Email:Smtp:Port");
-
-                if (_environment.IsProduction())
-                {
-                    client = new SmtpClient()
-                    {
-                        Host = host,
-                        Port = port,
-                        Credentials = new NetworkCredential(
-                         _config.GetValue<String>("Email:Smtp:ProdUsername"),
-                         _config.GetValue<String>("Email:Smtp:ProdPassword")
-                     ),
-                        EnableSsl = true
-                    };
-                }
-                else
-                {
-                    client = new SmtpClient()
-                    {
-                        Host = host,
-                        Port = port,
-                        Credentials = new NetworkCredential(
-                            _config.GetValue<String>("Email:Smtp:Username"),
-                            _config.GetValue<String>("Email:Smtp:Password")
-                        ),
-                        EnableSsl = true
-                    };
-                }
-
-                string sender = _config.GetValue<string>("SiteName") + "@nackademin.se";
                
-                string receiver = adv.Member.Email; 
-
-                // from, to, subject, text
-                client.Send(sender, receiver, mailSubject, mailText);
-
-
-    */
                 return RedirectToAction("DetailsAdv", new { id = adv.Id });
             }
 

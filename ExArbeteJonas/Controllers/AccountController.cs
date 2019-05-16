@@ -141,14 +141,14 @@ namespace ExArbeteJonas.Controllers
             return View(regUser);
         }
 
-        // Registrera sig som ny Member
+        // Registrera sig som ny Medlem
         [AllowAnonymous]
         public IActionResult Register()
         {
             return View();
         }
 
-        // Registrera sig som ny Member
+        // Registrera sig som ny Medlem
         [AllowAnonymous]
         [HttpPost]
         [ValidateAntiForgeryToken]
