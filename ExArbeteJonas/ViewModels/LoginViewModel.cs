@@ -11,11 +11,11 @@ namespace ExArbeteJonas.ViewModels
     {
         [DisplayName("Skriv in ditt användarnamn")]
         [Required(ErrorMessage = "Användarnamn är obligatoriskt")]
-        public string AnvandarNamn { get; set; }
+        public string UserName { get; set; }
 
         [DataType(DataType.Password)]
         [DisplayName("Skriv in ditt lösenord")]
         [Required(ErrorMessage = "Lösenord är obligatoriskt")]
-        public string Losenord { get; set; }
+        public string Password { get; set; }
     }   
 }

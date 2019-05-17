@@ -12,7 +12,7 @@ namespace ExArbeteJonas.ViewModels
         [DisplayName("Skriv in Namn")]
         [Required(ErrorMessage = "Namn är obligatoriskt")]
         [StringLength(40, ErrorMessage = "Förnamn får ha max 40 tecken")]
-        public string Namn { get; set; }
+        public string Name { get; set; }
 
         [DisplayName("Skriv in Email")]
         [Required(ErrorMessage = "Email är obligatoriskt")]
@@ -23,18 +23,18 @@ namespace ExArbeteJonas.ViewModels
         [DisplayName("Skriv in telefonnummer")]
         [StringLength(20, ErrorMessage = "Telefonnummer får ha max 20 tecken")]
         [Phone(ErrorMessage = "Ogiltigt telefonnummer")]
-        public string Telefon { get; set; }
+        public string Phone { get; set; }
 
         [DisplayName("Skriv in Användarnamn")]
         [Required(ErrorMessage = "Användarnamn är obligatoriskt")]
         [StringLength(20, ErrorMessage = "Användarnamn får ha max 20 tecken")]
-        public string AnvandarNamn { get; set; }
+        public string UserName { get; set; }
 
         [DataType(DataType.Password)]
         [DisplayName("Skriv in Lösenord")]
         [Required(ErrorMessage = "Lösenord är obligatoriskt")]
         [StringLength(20, ErrorMessage = "Lösenordet måste ha minst {2} och högst {1} tecken.", MinimumLength = 6)]
-        public string Losenord { get; set; }
+        public string Password { get; set; }
     }   
     
 }

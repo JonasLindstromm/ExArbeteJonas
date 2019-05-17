@@ -7,7 +7,7 @@
     <a asp-action="RegisterAdmin">Registrera ny Administratör</a>
 </div>
 <br />
-@{ var admins = Model.Where(i => i.RollNamn == "Admin");
+@{ var admins = Model.Where(i => i.RoleName == "Admin");
     if (admins.Count() > 0)
     {
         <h2 class="ice-two">Alla registrerade Administratörer</h2>
@@ -31,16 +31,16 @@
                 {
                     <tr>
                         <td>
-                            @item.Namn
+                            @item.Name
                         </td>
                         <td>
-                            @item.AnvandarNamn
+                            @item.UserName
                         </td>
                         <td>
                             @item.Email
                         </td>
                         <td>
-                            @if (item.AnvandarNamn != User.Identity.Name)
+                            @if (item.UserName != User.Identity.Name)
                             {
                                 <a asp-action="Delete" asp-route-id="@item.Id">Avregistrera Administratör</a>
                             }
@@ -56,7 +56,7 @@
     }
 }
 
-@{ var members = Model.Where(i => i.RollNamn == "Member");
+@{ var members = Model.Where(i => i.RoleName == "Member");
     if (members.Count() > 0)
     {
         <h2 class="ice-two">Alla registrerade Medlemmar</h2>
@@ -80,10 +80,10 @@
                 {
                     <tr>
                         <td>
-                            @item.Namn
+                            @item.Name
                         </td>
                         <td>
-                            @item.AnvandarNamn
+                            @item.UserName
                         </td>
                         <td>
                             @item.Email

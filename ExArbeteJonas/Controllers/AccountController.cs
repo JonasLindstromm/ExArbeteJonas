@@ -45,7 +45,7 @@ namespace ExArbeteJonas.Controllers
             }
 
             UserViewModel viewModel = new UserViewModel();
-            viewModel.AnvandarNamn = user.UserName;
+            viewModel.UserName = user.UserName;
             viewModel.Id = user.Id;
 
             return View(viewModel);
@@ -162,7 +162,7 @@ namespace ExArbeteJonas.Controllers
             foreach (var user in Users)
             {
                 UserViewModel adminUser = new UserViewModel
-                { Id = user.Id, Namn = user.Name, AnvandarNamn = user.UserName, Email = user.Email, RollNamn = "Admin" };
+                { Id = user.Id, Name = user.Name, UserName = user.UserName, Email = user.Email, RoleName = "Admin" };
                 {
                     allUsers.Add(adminUser);
                 }
@@ -173,14 +173,14 @@ namespace ExArbeteJonas.Controllers
             foreach (var user in Users)
             {
                 UserViewModel memberUser = new UserViewModel
-                { Id = user.Id, Namn = user.Name, AnvandarNamn = user.UserName, Email = user.Email, RollNamn = "Member" };
+                { Id = user.Id, Name = user.Name, UserName = user.UserName, Email = user.Email, RoleName = "Member" };
                 {
                     allUsers.Add(memberUser);
                 }
             }
 
             // Sortera användarna efter Användarnamn
-            allUsers.OrderBy(u => u.AnvandarNamn);
+            allUsers.OrderBy(u => u.UserName);
 
             return View(allUsers);
         }
@@ -201,7 +201,7 @@ namespace ExArbeteJonas.Controllers
             if (ModelState.IsValid)
             {
                 //Kontrollera om det är en giltig användare
-                Microsoft.AspNetCore.Identity.SignInResult result = await _signInManager.PasswordSignInAsync(loginUser.AnvandarNamn, loginUser.Losenord, false, false);
+                Microsoft.AspNetCore.Identity.SignInResult result = await _signInManager.PasswordSignInAsync(loginUser.UserName, loginUser.Password, false, false);
 
                 //Om inloggningen är riktig så ska en sida med Annonser visas
                 if (result.Succeeded)
@@ -244,13 +244,13 @@ namespace ExArbeteJonas.Controllers
                 // Kopierar värdena som matades in i Registervyn till ett ApplicationUser objekt              
                 ApplicationUser user = new ApplicationUser();
 
-                user.Name = regUser.Namn;
+                user.Name = regUser.Name;
                 user.Email = regUser.Email;
-                user.PhoneNumber = regUser.Telefon;
-                user.UserName = regUser.AnvandarNamn;
+                user.PhoneNumber = regUser.Phone;
+                user.UserName = regUser.UserName;
 
                 //Skapa användaren i databasen
-                IdentityResult result = await _userManager.CreateAsync(user, regUser.Losenord);
+                IdentityResult result = await _userManager.CreateAsync(user, regUser.Password);
 
                 // Om det går bra tilldelas rollen Admin till användaren                
                 if (result.Succeeded)
@@ -284,13 +284,13 @@ namespace ExArbeteJonas.Controllers
                 // Kopierar värdena som matades in i Registervyn till ett ApplicationUser objekt              
                 ApplicationUser user = new ApplicationUser();
 
-                user.Name = regUser.Namn;
+                user.Name = regUser.Name;
                 user.Email = regUser.Email;
-                user.PhoneNumber = regUser.Telefon;
-                user.UserName = regUser.AnvandarNamn;
+                user.PhoneNumber = regUser.Phone;
+                user.UserName = regUser.UserName;
 
                 // Skapa användaren i databasen
-                IdentityResult result = await _userManager.CreateAsync(user, regUser.Losenord);
+                IdentityResult result = await _userManager.CreateAsync(user, regUser.Password);
 
                 // Om det går bra tilldelas rollen Member till användaren                
                 if (result.Succeeded)
@@ -310,34 +310,7 @@ namespace ExArbeteJonas.Controllers
 
             return View(regUser);
         }
-
-        /*
-        //Avregistrera en Administratör eller Medlem      
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Unregister(string id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            ApplicationUser user = await _userManager.FindByIdAsync(id);
-            if (user == null)
-            {
-                return NotFound();
-            }
-
-            // Kontrollera så att jag inte tar bort inloggad Administratör från Databasen
-            if (user.UserName != User.Identity.Name)
-            {
-                // Ta bort Medlemmen/Administratören från Databasen
-                await _userManager.DeleteAsync(user);
-            }
-
-            return RedirectToAction("Index");
-        }
-        */
-
+        
         // Visa alla fel som har med Identity att göra
         private void AddErrors(IdentityResult result)
         {
