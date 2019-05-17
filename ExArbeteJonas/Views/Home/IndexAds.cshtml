@@ -26,27 +26,39 @@
             <tbody>
                 @foreach (var item in Model.CurrentAds)
                 {
-                <tr>
-                    <td>
-                        @item.AdvType.Name
-                    </td>
-                    <td>
-                        @item.Title
-                    </td>
-                    <td>
-                        @item.Place
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.StartDate)
-                    </td>
-                    <td>
-                        @if (User.IsInRole("Admin"))
-                        {
-                            <a asp-action="DeleteAdv" asp-route-id="@item.Id">Ta bort annonsen | </a>
-                        }
-                        <a asp-action="DetailsAdv" asp-route-id="@item.Id">Visa hela annonsen</a>
-                    </td>
-                </tr>
+                    <tr>
+                        <td>
+                            @item.AdvType.Name
+                        </td>
+                        <td>
+                            @item.Title
+                        </td>
+                        <td>
+                            @item.Place
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.StartDate)
+                        </td>
+                        <td>
+                            @if (item.Member.UserName == User.Identity.Name)
+                            {
+
+                                <a asp-action="DeleteOwnAdv" asp-route-id="@item.Id">Ta bort annonsen | </a>
+                                <a asp-action="EditAdv" asp-route-id="@item.Id">Uppdatera annonsen | </a>
+                                <a asp-action="DetailsAdv" asp-route-id="@item.Id">Visa hela annonsen</a>
+                            }
+                            else
+                            {
+                                @if (User.IsInRole("Admin"))
+                                {
+                                    <a asp-action="DeleteAdv" asp-route-id="@item.Id">Ta bort annonsen | </a>
+                                }
+                                <a asp-action="DetailsAdv" asp-route-id="@item.Id">
+                                    Visa hela annonsen
+                                </a>
+                            }
+                        </td>
+                    </tr>
                 }
             </tbody>
         </table>

@@ -22,6 +22,7 @@ namespace ExArbeteJonas.DataLayer
         List<Equipment> GetEquipment(int advId);
         List<Advertisement> GetUserAds(string UserId);
         bool IsExistingAdv(Advertisement adv);
-        bool IsExistingEqm(Equipment eqm);      
+        bool IsExistingEqm(Equipment eqm);
+        string UpdateAdv(Advertisement adv);
     }
 }

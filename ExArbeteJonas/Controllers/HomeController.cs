@@ -300,6 +300,69 @@ namespace ExArbeteJonas.Controllers
 
             return View(viewModel);
         }
+        
+        // Uppdatera annons
+        [Authorize(Roles = "Member")]
+        public IActionResult EditAdv(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var adv = _businessLayer.GetAdv((int)id);
+            if (adv == null)
+            {
+                return NotFound();
+            }
+
+            CreateAdvViewModel viewModel = new CreateAdvViewModel();
+            viewModel.CurrentAdv = adv;
+
+            var advTypes = _businessLayer.GetAdvTypes();
+
+            foreach (var advType in advTypes)
+            {
+                viewModel.AdvTypeNames.Add(new SelectListItem { Text = advType.Name, Value = advType.Id.ToString() });
+            }
+
+            return View(viewModel);            
+        }
+
+        // Uppdatera annons
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Member")]
+        public async Task<IActionResult> EditAdv(CreateAdvViewModel viewModel)
+        {
+            ApplicationUser user = await _userManager.FindByNameAsync(User.Identity.Name.ToLower());
+            if (viewModel.CurrentAdv.MemberId != user.Id)
+            {
+                ModelState.AddModelError(string.Empty, "Annonsen kan bara uppdateras av Medlemmen som la in annonsen");
+            }
+
+            if (ModelState.IsValid)
+            {
+                // Begär att BusinessLagret uppdaterar annonsen
+                string result = _businessLayer.UpdateAdv(viewModel.CurrentAdv);
+                if (result == "OK")
+                {
+                    return RedirectToAction("IndexOwnAds");                   
+                }
+                else
+                {
+                    AddError(result);                   
+                }
+            }
+            var advTypes = _businessLayer.GetAdvTypes();
+
+            foreach (var advType in advTypes)
+            {
+                viewModel.AdvTypeNames.Add(new SelectListItem { Text = advType.Name, Value = advType.Id.ToString() });
+            }
+
+            return View(viewModel);           
+        }
 
         // Visa Startsidan       
         public IActionResult Index()

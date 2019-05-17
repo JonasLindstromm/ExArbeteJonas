@@ -94,7 +94,7 @@ namespace ExArbeteJonas.DataLayer
         public List<Advertisement> GetCurrentAds()
         {
             var allAds = _context.Advertisement.Include(a => a.AdvType)
-                .Include(a => a.Equipments);
+                .Include(a => a.Equipments).Include(a => a.Member);
 
             // Sortera annonserna i tidsordning                    
             return allAds.OrderBy(p => p.StartDate).ToList();
@@ -162,6 +162,20 @@ namespace ExArbeteJonas.DataLayer
             {
                 return false;
             }
+        }
+
+        public string UpdateAdv(Advertisement adv)
+        {           
+            try
+            {
+                _context.Update(adv);
+                _context.SaveChanges();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return "Uppdatering av annonsen misslyckades";
+            }
+            return "OK";
         }
     }
 }

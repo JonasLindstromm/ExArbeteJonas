@@ -205,7 +205,12 @@ namespace ExArbeteJonas.Controllers
 
                 //Om inloggningen är riktig så ska en sida med Annonser visas
                 if (result.Succeeded)
-                {
+                {                   
+                    if (User.IsInRole("Member"))
+                    {
+                        return RedirectToAction("IndexOwnAds", "Home");
+                    }
+
                     return RedirectToAction("IndexAds", "Home");
                 }
                 else
@@ -310,7 +315,7 @@ namespace ExArbeteJonas.Controllers
 
             return View(regUser);
         }
-        
+
         // Visa alla fel som har med Identity att göra
         private void AddErrors(IdentityResult result)
         {

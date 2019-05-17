@@ -24,6 +24,7 @@ namespace ExArbeteJonas.BusinessLayer
         void DeleteOldAds();
         string CreateEqm(Equipment eqm);
         List<Advertisement> SearchCurrentAds(int advTypeId, int eqTypeId, string searchTitle, string searchDescription, string searchPlace);
-        void SendEmail(string mailSubject, string mailText, string receiver);       
+        void SendEmail(string mailSubject, string mailText, string receiver);
+        string UpdateAdv(Advertisement adv);
     }
 }

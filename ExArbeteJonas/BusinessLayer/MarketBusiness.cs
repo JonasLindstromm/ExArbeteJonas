@@ -239,5 +239,10 @@ namespace ExArbeteJonas.BusinessLayer
             client.Send(sender, receiver, mailSubject, mailText);
 
         }
+
+        public string UpdateAdv(Advertisement adv)
+        {
+            return _marketData.UpdateAdv(adv);
+        }
     }
 }
