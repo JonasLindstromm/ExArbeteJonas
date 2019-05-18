@@ -73,3 +73,10 @@ ul {
     padding: 15px;
     text-align: center;
 }
+
+#myCarousel {
+    height: 580px;
+    width: auto;
+    overflow: hidden;
+}
+

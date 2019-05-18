@@ -2,19 +2,32 @@
 
 <h2 class="red-two">@Model.AdvType.Name</h2>
 <h2 class="ice-two">@Model.Title</h2>
-<div class="container">
+<div class="container">   
     <div class="col-md-4" align="center">
         <h3 class="ice-three">Beskrivning</h3>
         @Model.Description
-    </div>
-
-    <div class="col-md-4" align="center">
         <h3 class="ice-three">Annonsuppgifter:</h3>
         <ul>
             <li>Annonsen inlagd: @Html.DisplayFor(m => @Model.StartDate)</li>
             <li>Pris: @Model.Price Kr</li>
+            <li>Pris: @Model.Price Kr</li>
             <li>Plats: @Model.Place</li>
         </ul>
+    </div>
+    <div class="col-md-4" align="center">
+        <img src="~/images/Eqm1.jpg" alt="" class="img-responsive" />
+    </div>
+    <div class="col-md-4" align="center">
+        <h3 class="ice-three">Annonsör:</h3>
+        <ul>
+            <li>Användarnamn: @Model.Member.UserName</li>
+            @if (Model.Member.PhoneNumber != null)
+            {
+                <li>Telefon: @Model.Member.PhoneNumber</li>
+            }
+            <li>E-post: @Model.Member.Email</li>
+        </ul>
+        <a asp-action="SendMsg" asp-route-id="@Model.AdvId">Skicka E-post till annonsören</a>
         @if (@Model.Equipments.Count > 0)
         {
             <h3 class="ice-three">Detaljuppgifter om utrustningen:</h3>
@@ -39,19 +52,6 @@
             }
 
         }
-    </div>
-
-    <div class="col-md-4" align="center">
-        <h3 class="ice-three">Annonsör:</h3>
-        <ul>
-            <li>Användarnamn: @Model.Member.UserName</li>
-            @if (Model.Member.PhoneNumber != null)
-            {
-                <li>Telefon: @Model.Member.PhoneNumber</li>
-            }
-            <li>E-post: @Model.Member.Email</li>
-        </ul>
-        <a asp-action="SendMsg" asp-route-id="@Model.AdvId">Skicka E-post till annonsören</a>
     </div>
 </div>
 
