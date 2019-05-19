@@ -14,6 +14,7 @@ namespace ExArbeteJonas.DataLayer
         string CreateEquipmentType(EquipmentType eqType);
         void DeleteAdv(Advertisement adv);
         List<Advertisement> GetCurrentAds();
+        List<Equipment> GetCurrentEquipments();
         Advertisement GetAdv(int id);
         List<AdType> GetAdvTypes();
         List<EquipmentType> GetEquipmentTypes();
@@ -23,6 +24,6 @@ namespace ExArbeteJonas.DataLayer
         List<Advertisement> GetUserAds(string UserId);
         bool IsExistingAdv(Advertisement adv);
         bool IsExistingEqm(Equipment eqm);
-        string UpdateAdv(Advertisement adv);
+        string UpdateAdv(Advertisement adv);        
     }
 }

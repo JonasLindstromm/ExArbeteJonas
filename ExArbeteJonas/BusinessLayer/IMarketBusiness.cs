@@ -26,5 +26,8 @@ namespace ExArbeteJonas.BusinessLayer
         List<Advertisement> SearchCurrentAds(int advTypeId, int eqTypeId, string searchTitle, string searchDescription, string searchPlace);
         void SendEmail(string mailSubject, string mailText, string receiver);
         string UpdateAdv(Advertisement adv);
+        IDictionary<string, List<int>> GetAgeAdsStatistics(List<string> eqTypeNames, List<string> adTypeNames);
+        IDictionary<string, List<int>> GetNrAdsStatistics(List<string> eqTypeNames, List<string> adTypeNames);
+        IDictionary<string, List<int>> GetPriceAdsStatistics(List<string> eqTypeNames, List<string> adTypeNames);
     }
 }

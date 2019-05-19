@@ -22,14 +22,14 @@ namespace ExArbeteJonas.Controllers
     {
         private readonly Microsoft.AspNetCore.Identity.UserManager<ApplicationUser> _userManager;
         private readonly Microsoft.AspNetCore.Identity.SignInManager<ApplicationUser> _signInManager;
-        private readonly IMarketBusiness _businessLayer;       
+        private readonly IMarketBusiness _businessLayer;
 
         //Dependency Injection via konstruktorn
         public HomeController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IMarketBusiness businessLayer)
         {
             _userManager = userManager;
             _signInManager = signInManager;
-            _businessLayer = businessLayer;         
+            _businessLayer = businessLayer;
         }
 
         // Lägg till ny AnnonsTyp
@@ -218,6 +218,61 @@ namespace ExArbeteJonas.Controllers
             return View(eqType);
         }
 
+        // Visa statistik över Annonser
+        [Authorize(Roles = "Admin")]
+        public IActionResult CreateStatistics()
+        {
+            CreateStatisticsViewModel viewModel = new CreateStatisticsViewModel();
+            viewModel.StatisticsTypes.Add(new SelectListItem { Text = "Statistik över antal aktuella annonser", Value = "1" });
+            viewModel.StatisticsTypes.Add(new SelectListItem { Text = "Statistik över genomsnittligt antal dagar för aktuella annonser", Value = "2" });
+            viewModel.StatisticsTypes.Add(new SelectListItem { Text = "Statistik över genomsnittligt pris för aktuella annonser", Value = "3" });
+
+            return View(viewModel);
+        }
+
+        // Visa statistik över Annonser
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
+        public IActionResult CreateStatistics(CreateStatisticsViewModel viewModel)
+        {
+            if (viewModel.TypeId == 1)
+            {
+                StatisticsAdsViewModel statvM = new StatisticsAdsViewModel();
+                var adTypeNames = _businessLayer.GetAdvTypeNames();
+                statvM.AdTypeNames = adTypeNames;
+                var eqTypeNames = _businessLayer.GetEquipmentTypeNames();
+                statvM.EqTypeNames = eqTypeNames;
+               
+                statvM.Statistics = _businessLayer.GetNrAdsStatistics(eqTypeNames, adTypeNames);
+
+                return PartialView("_StatisticsAdsPartial", statvM);
+            }
+            else if (viewModel.TypeId == 2)
+            {
+                StatisticsAdsViewModel statvM = new StatisticsAdsViewModel();
+                var adTypeNames = _businessLayer.GetAdvTypeNames();
+                statvM.AdTypeNames = adTypeNames;
+                var eqTypeNames = _businessLayer.GetEquipmentTypeNames();
+                statvM.EqTypeNames = eqTypeNames;
+
+                statvM.Statistics = _businessLayer.GetAgeAdsStatistics(eqTypeNames, adTypeNames);
+
+                return PartialView("_StatisticsAgeAdsPartial", statvM);
+            }
+            else  //  viewModel.TypeId == 3
+            {
+                StatisticsAdsViewModel statvM = new StatisticsAdsViewModel();
+                var adTypeNames = _businessLayer.GetAdvTypeNames();
+                statvM.AdTypeNames = adTypeNames;
+                var eqTypeNames = _businessLayer.GetEquipmentTypeNames();
+                statvM.EqTypeNames = eqTypeNames;
+
+                statvM.Statistics = _businessLayer.GetPriceAdsStatistics(eqTypeNames, adTypeNames);
+                return PartialView("_StatisticsPriceAdsPartial", statvM);
+            }
+        }
+
         // Ta bort annons
         [Authorize(Roles = "Admin")]
         public IActionResult DeleteAdv(int? id)
@@ -300,7 +355,7 @@ namespace ExArbeteJonas.Controllers
 
             return View(viewModel);
         }
-        
+
         // Uppdatera annons
         [Authorize(Roles = "Member")]
         public IActionResult EditAdv(int? id)
@@ -326,7 +381,7 @@ namespace ExArbeteJonas.Controllers
                 viewModel.AdvTypeNames.Add(new SelectListItem { Text = advType.Name, Value = advType.Id.ToString() });
             }
 
-            return View(viewModel);            
+            return View(viewModel);
         }
 
         // Uppdatera annons
@@ -347,11 +402,11 @@ namespace ExArbeteJonas.Controllers
                 string result = _businessLayer.UpdateAdv(viewModel.CurrentAdv);
                 if (result == "OK")
                 {
-                    return RedirectToAction("IndexOwnAds");                   
+                    return RedirectToAction("IndexOwnAds");
                 }
                 else
                 {
-                    AddError(result);                   
+                    AddError(result);
                 }
             }
             var advTypes = _businessLayer.GetAdvTypes();
@@ -361,7 +416,7 @@ namespace ExArbeteJonas.Controllers
                 viewModel.AdvTypeNames.Add(new SelectListItem { Text = advType.Name, Value = advType.Id.ToString() });
             }
 
-            return View(viewModel);           
+            return View(viewModel);
         }
 
         // Visa Startsidan       
@@ -455,7 +510,7 @@ namespace ExArbeteJonas.Controllers
             if (ModelState.IsValid)
             {
                 _businessLayer.SendEmail(viewModel.Subject, viewModel.Message, adv.Member.Email);
-               
+
                 return RedirectToAction("DetailsAdv", new { id = adv.Id });
             }
 

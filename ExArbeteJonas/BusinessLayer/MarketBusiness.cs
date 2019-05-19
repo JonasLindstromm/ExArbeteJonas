@@ -95,7 +95,7 @@ namespace ExArbeteJonas.BusinessLayer
         // Ta bort alla annonser, som är äldre än 1 månad
         public void DeleteOldAds()
         {
-            var currentAds = _marketData.GetCurrentAds();          
+            var currentAds = _marketData.GetCurrentAds();
 
             var oldAds = currentAds.Where(a => (a.StartDate < DateTime.Now.AddMonths(-1)));
             foreach (var adv in oldAds)
@@ -144,6 +144,156 @@ namespace ExArbeteJonas.BusinessLayer
         public List<EquipmentType> GetEquipmentTypes()
         {
             return _marketData.GetEquipmentTypes();
+        }
+
+        // Ta fram statistik över antalet dagar för annonser av olika typer
+        public IDictionary<string, List<int>> GetAgeAdsStatistics(List<string> eqTypeNames, List<string> adTypeNames)
+        {
+            var statistics = new Dictionary<string, List<int>>();
+
+            var currentAds = _marketData.GetCurrentAds();
+            var currentEquipments = _marketData.GetCurrentEquipments();
+
+            var eqTypeStatistics = new List<int>();
+
+            // Räkna antalet dagar för annonser där utrustningen är ospecificerad
+            foreach (var adTypeName in adTypeNames)
+            {
+                var ads = currentAds.Where(a => a.AdvType.Name == adTypeName)
+                    .Where(a => a.Equipments.Count == 0);
+                eqTypeStatistics.Add(CalculateAverageNrDays(ads));
+            }
+            statistics.Add("Odefinerade", eqTypeStatistics);
+
+            // Räkna antalet dagar för annonser där utrustningen är specificerad
+            foreach (var eqTypeName in eqTypeNames)
+            {
+                eqTypeStatistics = new List<int>();
+
+                var equipments = currentEquipments.Where(e => e.EqType.Name == eqTypeName);
+
+                foreach (var adTypeName in adTypeNames)
+                {
+                    var ads = currentAds.Where(a => a.AdvType.Name == adTypeName)
+                        .Where(a => a.Equipments.Count == 1)
+                        .Where(a => a.Equipments.First().EqType.Name == eqTypeName);
+                    eqTypeStatistics.Add(CalculateAverageNrDays(ads));
+                }
+                statistics.Add(eqTypeName, eqTypeStatistics);
+            }
+
+            eqTypeStatistics = new List<int>();
+            // Räkna antalet dagar för annonser där utrustningen är ett paket
+            foreach (var adTypeName in adTypeNames)
+            {
+                var ads = currentAds.Where(a => a.AdvType.Name == adTypeName)
+                   .Where(a => a.Equipments.Count == 2);
+                eqTypeStatistics.Add(CalculateAverageNrDays(ads));
+            }
+            statistics.Add("Paket", eqTypeStatistics);
+
+
+            return statistics;
+        }
+
+        // Ta fram statistik över angivet pris för annonser av olika typer
+        public IDictionary<string, List<int>> GetPriceAdsStatistics(List<string> eqTypeNames, List<string> adTypeNames)
+        {
+            var statistics = new Dictionary<string, List<int>>();
+
+            var currentAds = _marketData.GetCurrentAds();
+            var currentEquipments = _marketData.GetCurrentEquipments();
+
+            var eqTypeStatistics = new List<int>();
+
+            // Räkna ut genomsnittspriset för annonser där utrustningen är ospecificerad
+            foreach (var adTypeName in adTypeNames)
+            {
+                var ads = currentAds.Where(a => a.AdvType.Name == adTypeName)
+                    .Where(a => a.Equipments.Count == 0);
+                eqTypeStatistics.Add(CalculateAveragePrice(ads));
+            }
+            statistics.Add("Odefinerade", eqTypeStatistics);
+
+            // Räkna ut genomsnittspriset för annonser där utrustningen är specificerad
+            foreach (var eqTypeName in eqTypeNames)
+            {
+                eqTypeStatistics = new List<int>();
+
+                var equipments = currentEquipments.Where(e => e.EqType.Name == eqTypeName);
+
+                foreach (var adTypeName in adTypeNames)
+                {
+                    var ads = currentAds.Where(a => a.AdvType.Name == adTypeName)
+                        .Where(a => a.Equipments.Count == 1)
+                        .Where(a => a.Equipments.First().EqType.Name == eqTypeName);
+                    eqTypeStatistics.Add(CalculateAveragePrice(ads));
+                }
+                statistics.Add(eqTypeName, eqTypeStatistics);
+            }
+
+            eqTypeStatistics = new List<int>();
+            // Räkna ut genomsnittspriset för annonser där utrustningen är ett paket
+            foreach (var adTypeName in adTypeNames)
+            {
+                var ads = currentAds.Where(a => a.AdvType.Name == adTypeName)
+                   .Where(a => a.Equipments.Count == 2);
+                eqTypeStatistics.Add(CalculateAveragePrice(ads));
+            }
+            statistics.Add("Paket", eqTypeStatistics);
+
+
+            return statistics;
+        }
+
+        // Ta fram statistik över antalet annonser av olika typer
+        public IDictionary<string, List<int>> GetNrAdsStatistics(List<string> eqTypeNames, List<string> adTypeNames)
+        {
+            var statistics = new Dictionary<string, List<int>>();
+
+            var currentAds = _marketData.GetCurrentAds();
+            var currentEquipments = _marketData.GetCurrentEquipments();
+
+            var eqTypeStatistics = new List<int>();
+
+            // Räkna antalet annonser där utrustningen är ospecificerad
+            foreach (var adTypeName in adTypeNames)
+            {
+                int count = currentAds.Where(a => a.AdvType.Name == adTypeName)
+                    .Where(a => a.Equipments.Count == 0).Count();
+                eqTypeStatistics.Add(count);
+            }
+            statistics.Add("Odefinerade", eqTypeStatistics);
+
+            // Räkna antalet annonser där en utrustning är specificerad
+            foreach (var eqTypeName in eqTypeNames)
+            {
+                eqTypeStatistics = new List<int>();
+
+                foreach (var adTypeName in adTypeNames)
+                {                    
+                    var ads = currentAds.Where(a => a.AdvType.Name == adTypeName)
+                       .Where(a => a.Equipments.Count == 1)
+                       .Where(a => a.Equipments.First().EqType.Name == eqTypeName);
+                  
+                    eqTypeStatistics.Add(ads.Count());
+                }
+
+                statistics.Add(eqTypeName, eqTypeStatistics);
+            }
+
+            eqTypeStatistics = new List<int>();
+
+            // Räkna antalet annonser där utrustningen är ett paket
+            foreach (var adTypeName in adTypeNames)
+            {
+                int count = currentAds.Where(a => a.AdvType.Name == adTypeName)
+                    .Where(a => a.Equipments.Count == 2).Count();
+                eqTypeStatistics.Add(count);
+            }
+            statistics.Add("Paket", eqTypeStatistics);
+
+            return statistics;
         }
 
         // Läs alla annonser som en viss användare har lagt in
@@ -237,12 +387,47 @@ namespace ExArbeteJonas.BusinessLayer
 
             // from, to, subject, text
             client.Send(sender, receiver, mailSubject, mailText);
-
         }
 
         public string UpdateAdv(Advertisement adv)
         {
             return _marketData.UpdateAdv(adv);
+        }
+
+        // Beräkna genomsnittligt antal dagar för annonser
+        private int CalculateAverageNrDays(IEnumerable<Advertisement> ads)
+        {
+            if (ads.Count() == 0)
+            {
+                return 0;
+            }
+            int counter = 0;
+            int sum = 0;
+            foreach (var ad in ads)
+            {
+                counter++;
+                sum += (DateTime.Now - ad.StartDate).Days;
+            }
+
+            return sum / counter;
+        }
+
+        // Beräkna genomsnittligt pris för annonser
+        private int CalculateAveragePrice(IEnumerable<Advertisement> ads)
+        {
+            if (ads.Count() == 0)
+            {
+                return 0;
+            }
+            int counter = 0;
+            int sum = 0;
+            foreach (var ad in ads)
+            {
+                counter++;
+                sum += ad.Price;
+            }
+
+            return sum / counter;
         }
     }
 }

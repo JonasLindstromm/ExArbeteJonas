@@ -1,0 +1,25 @@
+﻿@model ExArbeteJonas.ViewModels.CreateStatisticsViewModel
+
+<h2 class="ice-two">Statistik</h2>
+
+<div class="container">
+    <div class="row col-md-4 col-md-offset-4">
+        <div class="col">
+            <form asp-action="CreateStatistics" asp-controller="Home" data-ajax="true" data-ajax-method="POST" data-ajax-mode="replace" data-ajax-update="#Statistics">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-group">
+                    <label asp-for="TypeId" class="control-label"></label>
+                    <select asp-for="TypeId" class="form-control" asp-items="@Model.StatisticsTypes"></select>
+                </div>
+                <div class="form-group" align="center">
+                    <input type="submit" value="Visa Statistik" class="btn btn-info" />
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div id="Statistics"></div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

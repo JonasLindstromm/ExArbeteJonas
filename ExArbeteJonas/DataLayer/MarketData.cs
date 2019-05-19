@@ -100,6 +100,12 @@ namespace ExArbeteJonas.DataLayer
             return allAds.OrderBy(p => p.StartDate).ToList();
         }
 
+        // Hämta alla Utrustningar
+        public List<Equipment> GetCurrentEquipments()
+        {
+            return _context.Equipment.Include(e => e.EqType).Include(e => e.ActualAd.AdvType).ToList();
+        }
+                     
         // Hämta utrustning för en viss annons
         public List<Equipment> GetEquipment(int advId)
         {        

@@ -9,8 +9,7 @@
         <h3 class="ice-three">Annonsuppgifter:</h3>
         <ul>
             <li>Annonsen inlagd: @Html.DisplayFor(m => @Model.StartDate)</li>
-            <li>Pris: @Model.Price Kr</li>
-            <li>Pris: @Model.Price Kr</li>
+            <li>Pris: @Model.Price Kr</li>           
             <li>Plats: @Model.Place</li>
         </ul>
     </div>
@@ -51,6 +50,10 @@
                 </ul>
             }
 
+        }
+        else
+        {
+            <h3 class="ice-three">Inga detaljuppgifter om utrustningen</h3>
         }
     </div>
 </div>

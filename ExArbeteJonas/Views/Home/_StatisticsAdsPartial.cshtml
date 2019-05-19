@@ -1,0 +1,26 @@
+﻿@model ExArbeteJonas.ViewModels.StatisticsAdsViewModel
+
+<h3 class="ice-three">Statistik över antal aktuella annonser:</h3>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Antal</th>
+            @foreach (var adType in Model.AdTypeNames)
+            {
+                <th>@adType</th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (KeyValuePair<string, List<int>> item in Model.Statistics)
+        {
+            <tr>
+                <td>@item.Key</td>
+                @foreach (var number in item.Value)
+                {
+                    <td>@number</td>
+                }
+            </tr>
+        }
+    </tbody>
+</table>

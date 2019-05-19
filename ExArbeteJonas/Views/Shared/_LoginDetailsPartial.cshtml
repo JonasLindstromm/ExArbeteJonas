@@ -9,7 +9,7 @@
 {
 <ul class="nav navbar-nav">
     <li><a asp-area="" asp-controller="Home" asp-action="IndexRules">Regler</a></li>
-    <li><a asp-area="" asp-controller="Home" asp-action="IndexAds">Alla annonser</a></li>
+    <li><a asp-area="" asp-controller="Home" asp-action="IndexAds">Annonser</a></li>
     <li><a asp-area="" asp-controller="Home" asp-action="SearchAds">Sök annonser</a></li>
     @if (User.IsInRole("Member"))
     {
@@ -22,6 +22,7 @@
     {
         <li><a asp-area="" asp-controller="Account" asp-action="Index">Behörigheter</a></li>
         <li><a asp-area="" asp-controller="Home" asp-action="IndexTypes">Adm</a></li>
+        <li><a asp-area="" asp-controller="Home" asp-action="CreateStatistics">Statistik</a></li>
         <li><a asp-area="" asp-controller="Account" asp-action="Edit" asp-route-id="@userManager.GetUserId(User)">Ändra mina Uppgifter</a></li>
         <li><a>@userManager.GetUserName(User) inloggad som Administratör</a></li>
     }
