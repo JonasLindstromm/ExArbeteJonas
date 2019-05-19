@@ -5,7 +5,7 @@
 <div class="container">
     <div class="row col-md-4 col-md-offset-4">
         <div class="col">
-            <form asp-controller="Home" asp-action="CreateAdv" method="post">
+            <form enctype="multipart/form-data" asp-controller="Home" asp-action="CreateAdv" method="post">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <div class="form-group">
                     <label asp-for="CurrentAdv.AdvTypeId" class="control-label"></label>
@@ -31,6 +31,11 @@
                     <input asp-for="CurrentAdv.Place" class="form-control" />
                     <span asp-validation-for="CurrentAdv.Place" class="text-danger"></span>
                 </div>
+                <div class="form-group">
+                    <label asp-for="MyImage" class="control-label"></label>
+                    <input asp-for="MyImage" class="form-control" />
+                    <span asp-validation-for="MyImage" class="text-danger"></span>
+                </div>                             
                 <div class="form-group" align="center">
                     <input type="submit" value="Skapa Annonsen" class="btn btn-info" />
                 </div>

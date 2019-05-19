@@ -4,10 +4,23 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace ExArbeteJonas.Migrations
 {
-    public partial class Initial : Migration
+    public partial class Initial2 : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "AdType",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    Name = table.Column<string>(maxLength: 20, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AdType", x => x.Id);
+                });
+
             migrationBuilder.CreateTable(
                 name: "AspNetRoles",
                 columns: table => new
@@ -49,6 +62,19 @@ namespace ExArbeteJonas.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "EquipmentType",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    Name = table.Column<string>(maxLength: 20, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EquipmentType", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "AspNetRoleClaims",
                 columns: table => new
                 {
@@ -67,6 +93,38 @@ namespace ExArbeteJonas.Migrations
                         principalTable: "AspNetRoles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Advertisement",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    MemberId = table.Column<string>(nullable: true),
+                    AdvTypeId = table.Column<int>(nullable: false),
+                    Title = table.Column<string>(maxLength: 50, nullable: false),
+                    Description = table.Column<string>(maxLength: 500, nullable: false),
+                    Price = table.Column<int>(nullable: false),
+                    Place = table.Column<string>(maxLength: 25, nullable: false),
+                    StartDate = table.Column<DateTime>(nullable: false),
+                    ImageFileName = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Advertisement", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Advertisement_AdType_AdvTypeId",
+                        column: x => x.AdvTypeId,
+                        principalTable: "AdType",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Advertisement_AspNetUsers_MemberId",
+                        column: x => x.MemberId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -154,6 +212,46 @@ namespace ExArbeteJonas.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Equipment",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    ActualAdId = table.Column<int>(nullable: false),
+                    EqTypeId = table.Column<int>(nullable: false),
+                    Make = table.Column<string>(maxLength: 25, nullable: false),
+                    Model = table.Column<string>(maxLength: 25, nullable: true),
+                    Size = table.Column<string>(maxLength: 10, nullable: true),
+                    Length = table.Column<string>(maxLength: 10, nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Equipment", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Equipment_Advertisement_ActualAdId",
+                        column: x => x.ActualAdId,
+                        principalTable: "Advertisement",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Equipment_EquipmentType_EqTypeId",
+                        column: x => x.EqTypeId,
+                        principalTable: "EquipmentType",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Advertisement_AdvTypeId",
+                table: "Advertisement",
+                column: "AdvTypeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Advertisement_MemberId",
+                table: "Advertisement",
+                column: "MemberId");
+
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
@@ -192,6 +290,16 @@ namespace ExArbeteJonas.Migrations
                 column: "NormalizedUserName",
                 unique: true,
                 filter: "[NormalizedUserName] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Equipment_ActualAdId",
+                table: "Equipment",
+                column: "ActualAdId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Equipment_EqTypeId",
+                table: "Equipment",
+                column: "EqTypeId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -212,7 +320,19 @@ namespace ExArbeteJonas.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "Equipment");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoles");
+
+            migrationBuilder.DropTable(
+                name: "Advertisement");
+
+            migrationBuilder.DropTable(
+                name: "EquipmentType");
+
+            migrationBuilder.DropTable(
+                name: "AdType");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");

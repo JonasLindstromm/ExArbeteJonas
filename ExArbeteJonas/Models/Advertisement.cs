@@ -42,6 +42,8 @@ namespace ExArbeteJonas.Models
         [DataType(DataType.Date)]
         public DateTime StartDate { get; set; }
 
+        public string ImageFileName { get; set; }
+
         public virtual ApplicationUser Member { get; set; }
         public virtual AdType AdvType { get; set; }
         public ICollection<Equipment> Equipments { get; set; }

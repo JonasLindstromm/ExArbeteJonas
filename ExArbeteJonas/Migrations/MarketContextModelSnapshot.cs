@@ -4,16 +4,14 @@ using ExArbeteJonas.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace ExArbeteJonas.Migrations
 {
     [DbContext(typeof(MarketContext))]
-    [Migration("20190506210421_Initial")]
-    partial class Initial
+    partial class MarketContextModelSnapshot : ModelSnapshot
     {
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -72,6 +70,105 @@ namespace ExArbeteJonas.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers");
+                });
+
+            modelBuilder.Entity("ExArbeteJonas.Models.AdType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(20);
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AdType");
+                });
+
+            modelBuilder.Entity("ExArbeteJonas.Models.Advertisement", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("AdvTypeId");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(500);
+
+                    b.Property<string>("ImageFileName");
+
+                    b.Property<string>("MemberId");
+
+                    b.Property<string>("Place")
+                        .IsRequired()
+                        .HasMaxLength(25);
+
+                    b.Property<int>("Price");
+
+                    b.Property<DateTime>("StartDate");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(50);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AdvTypeId");
+
+                    b.HasIndex("MemberId");
+
+                    b.ToTable("Advertisement");
+                });
+
+            modelBuilder.Entity("ExArbeteJonas.Models.Equipment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("ActualAdId");
+
+                    b.Property<int>("EqTypeId");
+
+                    b.Property<string>("Length")
+                        .HasMaxLength(10);
+
+                    b.Property<string>("Make")
+                        .IsRequired()
+                        .HasMaxLength(25);
+
+                    b.Property<string>("Model")
+                        .HasMaxLength(25);
+
+                    b.Property<string>("Size")
+                        .HasMaxLength(10);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ActualAdId");
+
+                    b.HasIndex("EqTypeId");
+
+                    b.ToTable("Equipment");
+                });
+
+            modelBuilder.Entity("ExArbeteJonas.Models.EquipmentType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(20);
+
+                    b.HasKey("Id");
+
+                    b.ToTable("EquipmentType");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -182,6 +279,31 @@ namespace ExArbeteJonas.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens");
+                });
+
+            modelBuilder.Entity("ExArbeteJonas.Models.Advertisement", b =>
+                {
+                    b.HasOne("ExArbeteJonas.Models.AdType", "AdvType")
+                        .WithMany("Advertisements")
+                        .HasForeignKey("AdvTypeId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("ExArbeteJonas.IdentityData.ApplicationUser", "Member")
+                        .WithMany("ActualAds")
+                        .HasForeignKey("MemberId");
+                });
+
+            modelBuilder.Entity("ExArbeteJonas.Models.Equipment", b =>
+                {
+                    b.HasOne("ExArbeteJonas.Models.Advertisement", "ActualAd")
+                        .WithMany("Equipments")
+                        .HasForeignKey("ActualAdId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("ExArbeteJonas.Models.EquipmentType", "EqType")
+                        .WithMany("Equipments")
+                        .HasForeignKey("EqTypeId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

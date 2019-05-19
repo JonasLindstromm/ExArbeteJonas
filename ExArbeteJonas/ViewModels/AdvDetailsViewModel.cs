@@ -20,6 +20,7 @@ namespace ExArbeteJonas.ViewModels
 
         [DataType(DataType.Date)]
         public DateTime StartDate { get; set; }
+        public string ImageFileName { get; set; }
         public List<Equipment> Equipments { get; set; }
     }
 }

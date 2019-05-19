@@ -5,11 +5,12 @@
 <div class="container">
     <div class="row col-md-4 col-md-offset-4">
         <div class="col">
-            <form asp-controller="Home" asp-action="EditAdv" method="post">
+            <form enctype="multipart/form-data" asp-controller="Home" asp-action="EditAdv" method="post">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <input type="hidden" asp-for="CurrentAdv.Id" />
                 <input type="hidden" asp-for="CurrentAdv.MemberId" />
                 <input type="hidden" asp-for="CurrentAdv.StartDate" />
+                <input type="hidden" asp-for="CurrentAdv.ImageFileName" />
                 <div class="form-group">
                     <label asp-for="CurrentAdv.AdvTypeId" class="control-label"></label>
                     <select asp-for="CurrentAdv.AdvTypeId" class="form-control" asp-items="@Model.AdvTypeNames"></select>
@@ -33,6 +34,11 @@
                     <label asp-for="CurrentAdv.Place" class="control-label"></label>
                     <input asp-for="CurrentAdv.Place" class="form-control" />
                     <span asp-validation-for="CurrentAdv.Place" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="MyImage" class="control-label"></label>
+                    <input asp-for="MyImage" class="form-control" />
+                    <span asp-validation-for="MyImage" class="text-danger"></span>
                 </div>
                 <div class="form-group" align="center">
                     <input type="submit" value="Uppdatera Annonsen" class="btn btn-info" />

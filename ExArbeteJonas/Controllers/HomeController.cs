@@ -15,6 +15,9 @@ using System.Net.Mail;
 using System.Net;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Http;
+using System.IO;
+using System.Net.Http.Headers;
 
 namespace ExArbeteJonas.Controllers
 {
@@ -23,13 +26,16 @@ namespace ExArbeteJonas.Controllers
         private readonly Microsoft.AspNetCore.Identity.UserManager<ApplicationUser> _userManager;
         private readonly Microsoft.AspNetCore.Identity.SignInManager<ApplicationUser> _signInManager;
         private readonly IMarketBusiness _businessLayer;
+        private IHostingEnvironment _hostingEnv;
 
         //Dependency Injection via konstruktorn
-        public HomeController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IMarketBusiness businessLayer)
+        public HomeController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IMarketBusiness businessLayer,
+            IHostingEnvironment hostingEnv)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _businessLayer = businessLayer;
+            _hostingEnv = hostingEnv;
         }
 
         // Lägg till ny AnnonsTyp
@@ -87,9 +93,7 @@ namespace ExArbeteJonas.Controllers
         {
             if (ModelState.IsValid)
             {
-                // Begär att BusinessLagret skapar en ny annons
                 Advertisement adv = new Advertisement();
-
                 adv.AdvTypeId = viewModel.CurrentAdv.AdvTypeId;
                 adv.Title = viewModel.CurrentAdv.Title;
                 adv.Description = viewModel.CurrentAdv.Description;
@@ -97,9 +101,26 @@ namespace ExArbeteJonas.Controllers
                 adv.Place = viewModel.CurrentAdv.Place;
                 adv.StartDate = DateTime.Now;
 
+                IFormFile imageFile = viewModel.MyImage; 
+
+                // Om medlemmen har laddat upp en bildfil
+                if (imageFile != null)
+                {
+                    if (imageFile.Length > 0)
+                    {                       
+                        var uniqueFileName = GetUniqueFileName(imageFile.FileName);
+                        var uploads = Path.Combine(_hostingEnv.WebRootPath, "Uploads");
+                        var filePath = Path.Combine(uploads, uniqueFileName);
+                        imageFile.CopyTo(new FileStream(filePath, FileMode.Create));
+
+                        adv.ImageFileName = uniqueFileName;
+                    }
+                }                
+
                 ApplicationUser user = await _userManager.FindByNameAsync(User.Identity.Name.ToLower());
                 adv.MemberId = user.Id;
 
+                // Begär att BusinessLagret skapar en ny annons
                 string result = _businessLayer.CreateAdv(adv);
                 if (result == "OK")
                 {
@@ -243,7 +264,7 @@ namespace ExArbeteJonas.Controllers
                 statvM.AdTypeNames = adTypeNames;
                 var eqTypeNames = _businessLayer.GetEquipmentTypeNames();
                 statvM.EqTypeNames = eqTypeNames;
-               
+
                 statvM.Statistics = _businessLayer.GetNrAdsStatistics(eqTypeNames, adTypeNames);
 
                 return PartialView("_StatisticsAdsPartial", statvM);
@@ -351,6 +372,7 @@ namespace ExArbeteJonas.Controllers
             viewModel.Price = ad.Price;
             viewModel.Place = ad.Place;
             viewModel.StartDate = ad.StartDate;
+            viewModel.ImageFileName = ad.ImageFileName;
             viewModel.Equipments = _businessLayer.GetEquipment((int)(id));
 
             return View(viewModel);
@@ -398,6 +420,21 @@ namespace ExArbeteJonas.Controllers
 
             if (ModelState.IsValid)
             {
+                IFormFile imageFile = viewModel.MyImage;
+                // Om medlemmen har laddat upp en bildfil
+                if (imageFile != null)
+                {
+                    if (imageFile.Length > 0)
+                    {
+                        var uniqueFileName = GetUniqueFileName(imageFile.FileName);
+                        var uploads = Path.Combine(_hostingEnv.WebRootPath, "Uploads");
+                        var filePath = Path.Combine(uploads, uniqueFileName);
+                        imageFile.CopyTo(new FileStream(filePath, FileMode.Create));
+
+                        viewModel.CurrentAdv.ImageFileName = uniqueFileName;
+                    }
+                }
+
                 // Begär att BusinessLagret uppdaterar annonsen
                 string result = _businessLayer.UpdateAdv(viewModel.CurrentAdv);
                 if (result == "OK")
@@ -593,6 +630,15 @@ namespace ExArbeteJonas.Controllers
             }
 
             return View(vM);
+        }
+
+        private string GetUniqueFileName(string fileName)
+        {
+            fileName = Path.GetFileName(fileName);
+            return Path.GetFileNameWithoutExtension(fileName)
+                      + "_"
+                      + Guid.NewGuid().ToString().Substring(0, 4)
+                      + Path.GetExtension(fileName);
         }
 
         // Visa felmeddelande
