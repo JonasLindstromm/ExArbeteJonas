@@ -101,13 +101,13 @@ namespace ExArbeteJonas.Controllers
                 adv.Place = viewModel.CurrentAdv.Place;
                 adv.StartDate = DateTime.Now;
 
-                IFormFile imageFile = viewModel.MyImage; 
+                IFormFile imageFile = viewModel.MyImage;
 
                 // Om medlemmen har laddat upp en bildfil
                 if (imageFile != null)
                 {
                     if (imageFile.Length > 0)
-                    {                       
+                    {
                         var uniqueFileName = GetUniqueFileName(imageFile.FileName);
                         var uploads = Path.Combine(_hostingEnv.WebRootPath, "Uploads");
                         var filePath = Path.Combine(uploads, uniqueFileName);
@@ -115,7 +115,7 @@ namespace ExArbeteJonas.Controllers
 
                         adv.ImageFileName = uniqueFileName;
                     }
-                }                
+                }
 
                 ApplicationUser user = await _userManager.FindByNameAsync(User.Identity.Name.ToLower());
                 adv.MemberId = user.Id;
@@ -206,6 +206,37 @@ namespace ExArbeteJonas.Controllers
             }
 
             return View(viewModel);
+        }
+
+        // Lägg till ny Regel
+        [Authorize(Roles = "Admin")]
+        public IActionResult CreateAdvRule()
+        {
+            return View();
+        }
+
+        // Lägg till ny Regel
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
+        public IActionResult CreateAdvRule([Bind("Id, Title, Description")] AdvRule advRule)
+        {
+            if (ModelState.IsValid)
+            {
+                // Begär att BusinessLagret lägger till den nya Regeln
+                string result = _businessLayer.CreateAdvRule(advRule);
+                if (result == "OK")
+                {
+                    return RedirectToAction("IndexTypes");
+                }
+                else
+                {
+                    AddError(result);
+                    return View(advRule);
+                }
+            }
+
+            return View(advRule);
         }
 
         // Lägg till ny UtrustningsTyp
@@ -347,6 +378,30 @@ namespace ExArbeteJonas.Controllers
             return RedirectToAction("IndexOwnAds");
         }
 
+
+        // Ta bort en regel för annonser
+        [Authorize(Roles = "Admin")]
+        public IActionResult DeleteAdvRule(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            // Begär att BusinessLagret hämtar en viss regel
+            AdvRule advRule = _businessLayer.GetAdvRule((int)id);
+
+            if (advRule == null)
+            {
+                return NotFound();
+            }
+            
+            // Begär att BusinessLagret tar bort regeln
+            _businessLayer.DeleteAdvRule(advRule);
+
+            return RedirectToAction("IndexTypes");
+        }
+
         // Visa alla detaljer i en annons
         public IActionResult DetailsAdv(int? id)
         {
@@ -376,6 +431,14 @@ namespace ExArbeteJonas.Controllers
             viewModel.Equipments = _businessLayer.GetEquipment((int)(id));
 
             return View(viewModel);
+        }
+
+        // Visa alla detaljer för en regel, i en Partial View
+        public IActionResult DetailsAdvRule(int id)
+        {
+            AdvRule advRule = _businessLayer.GetAdvRule(id);
+
+            return PartialView("_DetailsAdvRulePartial", advRule);
         }
 
         // Uppdatera annons
@@ -489,7 +552,10 @@ namespace ExArbeteJonas.Controllers
         // Visa sidan med Regler för Prylmarknaden      
         public IActionResult IndexRules()
         {
-            return View();
+            RulesViewModel viewModel = new RulesViewModel();
+            viewModel.CurrentRules = _businessLayer.GetRules();
+
+            return View(viewModel);
         }
 
         // Visa alla egna annonser   
@@ -510,11 +576,13 @@ namespace ExArbeteJonas.Controllers
         [Authorize(Roles = "Admin")]
         public IActionResult IndexTypes()
         {
-            TypesViewModel allTypes = new TypesViewModel();
-            allTypes.AdTypeNames = _businessLayer.GetAdvTypeNames();
-            allTypes.EquipmentTypeNames = _businessLayer.GetEquipmentTypeNames();
+            TypesViewModel viewModel = new TypesViewModel();
+            viewModel.AdTypeNames = _businessLayer.GetAdvTypeNames();
+            viewModel.EquipmentTypeNames = _businessLayer.GetEquipmentTypeNames();
 
-            return View(allTypes);
+            viewModel.CurrentRules = _businessLayer.GetRules();
+
+            return View(viewModel);
         }
 
         // Skicka Epost till Annonsör

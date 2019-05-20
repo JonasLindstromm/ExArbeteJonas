@@ -12,6 +12,7 @@ namespace ExArbeteJonas.Models
     {
         public virtual DbSet<AdType> AdType { get; set; }
         public virtual DbSet<Advertisement> Advertisement { get; set; }
+        public virtual DbSet<AdvRule> AdvRule { get; set; }
         public virtual DbSet<Equipment> Equipment { get; set; }
         public virtual DbSet<EquipmentType> EquipmentType { get; set; }       
 

@@ -1,6 +1,6 @@
 ﻿@model ExArbeteJonas.ViewModels.TypesViewModel
 
-<h2 class="ice-two">Administration av Annonstyper och Utrustningstyper</h2>
+<h2 class="ice-two">Administration av Annonstyper, Utrustningstyper och Regler för Prylmarknaden</h2>
 <br />
 <div class="container">
     <div class="col-md-6" align="center">
@@ -26,8 +26,47 @@
         <a asp-action="CreateEquipmentType">Registrera ny Utrustningstyp</a>
     </div>
 </div>
+<h3 class="ice-three">Regler</h3>
+<div class="col-md-4 col-md-offset-4" align="center">
+    <a asp-action="CreateAdvRule">Lägg till ny Regel</a>
+</div>
 <br />
-
+@if (Model.CurrentRules.Count() > 0)
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    Titel
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.CurrentRules)
+            {
+                <tr>
+                    <td>
+                        @item.Title
+                    </td>
+                    <td>
+                        <a asp-action="DeleteAdvRule" asp-route-id="@item.Id">Ta bort regeln |</a>
+                        <a asp-controller="Home"
+                           asp-action="DetailsAdvRule"
+                           asp-route-id=@item.Id
+                           data-ajax="true"
+                           data-ajax-method="get"
+                           data-ajax-mode="append"
+                           data-ajax-update="#AdvRuleDetails">
+                            Visa hela regeln
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+<div id="AdvRuleDetails"></div>
 
 
 

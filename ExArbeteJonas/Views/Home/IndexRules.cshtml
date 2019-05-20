@@ -1,5 +1,24 @@
-﻿<h2 class="ice-two">Regler för prylmarknaden</h2>
-<div class="container">
+﻿@model ExArbeteJonas.ViewModels.RulesViewModel
+
+@if (Model.CurrentRules.Count() == 0)
+{
+    <h2 class="ice-two">Det finns inga inlagda regler för prylmarknaden</h2>
+}
+else
+{
+    <h2 class="ice-two">Regler för prylmarknaden</h2>
+}
+
+@foreach (var item in Model.CurrentRules)
+{
+    <div class="container">
+        <div class="col-md-4 col-md-offset-4" align="center">
+            <h3 class="ice-three">@item.Title</h3>
+            @item.Description
+        </div>
+    </div>
+}
+@*<div class="container">
     <div class="col-md-4 col-md-offset-4" align="center">
         <h3 class="ice-three">Endast som Privatperson</h3>
         Du får bara annonsera som privatperson. Annonserna får inte ha något kommersiellt syfte.
@@ -28,4 +47,4 @@
         <h3 class="ice-three">Ta bort annonsen</h3>
         Som annonsör så ansvarar du för att ta bort inaktuella annonser. Annars ligger annonsen kvar 1 månad.
     </div>
-</div>
+</div>*@

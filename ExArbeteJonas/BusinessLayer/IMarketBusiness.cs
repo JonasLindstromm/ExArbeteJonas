@@ -9,16 +9,20 @@ namespace ExArbeteJonas.BusinessLayer
     public interface IMarketBusiness
     {
         string CreateAdv(Advertisement adv);
-        string CreateAdType(AdType adType);        
+        string CreateAdvRule(AdvRule advRule);
+        string CreateAdType(AdType adType);
         string CreateEquipmentType(EquipmentType eqType);
         void DeleteAdv(Advertisement adv);
+        void DeleteAdvRule(AdvRule advRule);
         void DeleteMemberAds(string memberId);
         List<Advertisement> GetCurrentAds();
+        List<AdvRule> GetRules();
         Advertisement GetAdv(int id);
+        AdvRule GetAdvRule(int id);
         List<string> GetAdvTypeNames();
         List<string> GetEquipmentTypeNames();
         List<AdType> GetAdvTypes();
-        List<EquipmentType> GetEquipmentTypes();       
+        List<EquipmentType> GetEquipmentTypes();
         List<Equipment> GetEquipment(int AdvId);
         List<Advertisement> GetUserAds(string UserId);
         void DeleteOldAds();
@@ -28,6 +32,6 @@ namespace ExArbeteJonas.BusinessLayer
         string UpdateAdv(Advertisement adv);
         IDictionary<string, List<int>> GetAgeAdsStatistics(List<string> eqTypeNames, List<string> adTypeNames);
         IDictionary<string, List<int>> GetNrAdsStatistics(List<string> eqTypeNames, List<string> adTypeNames);
-        IDictionary<string, List<int>> GetPriceAdsStatistics(List<string> eqTypeNames, List<string> adTypeNames);
+        IDictionary<string, List<int>> GetPriceAdsStatistics(List<string> eqTypeNames, List<string> adTypeNames);        
     }
 }

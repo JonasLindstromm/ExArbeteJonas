@@ -50,6 +50,12 @@ namespace ExArbeteJonas.BusinessLayer
             return _marketData.CreateAdv(adv);
         }
 
+        // Skapa en ny Regel för annonsering
+        public string CreateAdvRule(AdvRule advRule)
+        {          
+            return _marketData.CreateAdvRule(advRule);
+        }
+
         // Skapa ny Utrustning till en annons
         public string CreateEqm(Equipment eqm)
         {
@@ -81,6 +87,12 @@ namespace ExArbeteJonas.BusinessLayer
             _marketData.DeleteAdv(adv);
         }
 
+        // Ta bort en regel för Annonsering
+        public void DeleteAdvRule(AdvRule advRule)
+        {
+            _marketData.DeleteAdvRule(advRule);
+        }
+
         // Ta bort alla annonser, som lagts in av en viss Medlem
         public void DeleteMemberAds(string memberId)
         {
@@ -110,6 +122,12 @@ namespace ExArbeteJonas.BusinessLayer
             return _marketData.GetAdv(id);
         }
 
+        // Läs en regel för annonsering
+        public AdvRule GetAdvRule(int id)
+        {
+            return _marketData.GetAdvRule(id);
+        }
+
         // Läs namnen på existerande Annonstyper
         public List<string> GetAdvTypeNames()
         {
@@ -126,6 +144,11 @@ namespace ExArbeteJonas.BusinessLayer
         public List<Advertisement> GetCurrentAds()
         {
             return _marketData.GetCurrentAds();
+        }
+
+        public List<AdvRule> GetRules()
+        {
+            return _marketData.GetRules();            
         }
 
         // Läs all utrustning som är kopplad till en viss annons 

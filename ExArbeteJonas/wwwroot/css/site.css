@@ -42,12 +42,12 @@ body {
 }
 
 h1.ice-one {
-    color: aqua;
+    color: blue;
     text-align: center
 }
 
 h2.ice-two {
-    color: blue;
+    color:dodgerblue;
     text-align: center
 }
 
@@ -57,7 +57,12 @@ h2.red-two {
 }
 
 h3.ice-three {
-    color: lightblue;
+    color: royalblue;
+    text-align: center
+}
+
+h3.red-three {
+    color: red;
     text-align: center
 }
 

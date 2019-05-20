@@ -34,6 +34,14 @@ namespace ExArbeteJonas.DataLayer
             return "OK";
         }
 
+        // Skapa en regel för annonsering
+        public string CreateAdvRule(AdvRule advRule)
+        {            
+            _context.Add(advRule);
+            _context.SaveChanges();            
+            return "OK";
+        }
+
         // Skapa nu utrustning till en annons
         public string CreateEqm(Equipment eqm)
         {
@@ -57,6 +65,13 @@ namespace ExArbeteJonas.DataLayer
             _context.SaveChanges();
         }
 
+        // Ta bort en regel för annonsering
+        public void DeleteAdvRule(AdvRule advRule)
+        {
+            _context.AdvRule.Remove(advRule);
+            _context.SaveChanges();
+        }
+
         // Hämta en annons
         public Advertisement GetAdv(int id)
         {
@@ -64,6 +79,26 @@ namespace ExArbeteJonas.DataLayer
               .Include(a => a.AdvType)
               .Include(a => a.Member)
               .SingleOrDefault(m => m.Id == id);
+        }
+
+        // Hämta en regel för annonsering
+        public AdvRule GetAdvRule(int id)
+        {
+           
+            return _context.AdvRule              
+              .SingleOrDefault(m => m.Id == id);
+             
+
+
+            // Dummy Code   
+            /*
+            var rule = new AdvRule();
+            rule.Title = "NNNNNNNNN NNNNNNNNN NNNNNNNNN ";
+            rule.Description =
+                "NNNNNNNNN NNNNNNNNN NNNNNNNNN NNNNNNNNN NNNNNNNNN NNNNNNNNN";
+          
+            return rule;
+            */
         }
 
         // Läs namnen på existerande Annonstyper
@@ -105,7 +140,25 @@ namespace ExArbeteJonas.DataLayer
         {
             return _context.Equipment.Include(e => e.EqType).Include(e => e.ActualAd.AdvType).ToList();
         }
-                     
+
+        // Hämta alla regler för Annonsering
+        public List<AdvRule> GetRules()
+        {
+            return _context.AdvRule.ToList();
+
+            // Dummy Code 
+            /*
+            var rules = new List<AdvRule>();
+            var rule = new AdvRule();
+            rule.Title = "NNNNNNNNN NNNNNNNNN NNNNNNNNN ";
+            rule.Description =
+                "NNNNNNNNN NNNNNNNNN NNNNNNNNN NNNNNNNNN NNNNNNNNN NNNNNNNNN";
+            rules.Add(rule);
+            return rules;
+            */
+            
+        }
+
         // Hämta utrustning för en viss annons
         public List<Equipment> GetEquipment(int advId)
         {        
