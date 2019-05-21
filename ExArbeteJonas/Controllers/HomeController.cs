@@ -18,6 +18,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Http;
 using System.IO;
 using System.Net.Http.Headers;
+using Rotativa.AspNetCore;
+using System.Runtime.InteropServices.ComTypes;
 
 namespace ExArbeteJonas.Controllers
 {
@@ -395,7 +397,7 @@ namespace ExArbeteJonas.Controllers
             {
                 return NotFound();
             }
-            
+
             // Begär att BusinessLagret tar bort regeln
             _businessLayer.DeleteAdvRule(advRule);
 
@@ -584,6 +586,47 @@ namespace ExArbeteJonas.Controllers
 
             return View(viewModel);
         }
+
+        // Visa en annons som Pdf         
+        public IActionResult PdfAdv(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            // Begär att BusinessLagret hämtar en viss annons
+            Advertisement ad = _businessLayer.GetAdv((int)(id));
+
+            if (ad == null)
+            {
+                return NotFound();
+            }
+
+            AdvDetailsViewModel viewModel = new AdvDetailsViewModel();
+            viewModel.AdvId = (int)id;
+            viewModel.AdvType = ad.AdvType;
+            viewModel.Member = ad.Member;
+            viewModel.Title = ad.Title;
+            viewModel.Description = ad.Description;
+            viewModel.Price = ad.Price;
+            viewModel.Place = ad.Place;
+            viewModel.StartDate = ad.StartDate;
+            viewModel.ImageFileName = ad.ImageFileName;
+            viewModel.Equipments = _businessLayer.GetEquipment((int)(id));
+
+            /*
+            var pdfResult = new ViewAsPdf("PdfAdv", viewModel);
+            {
+                CustomSwitches = "--page-offset 0 --footer-center [page] --footer-font-size 12"
+                FileName = "";
+            };
+            return pdfResult;
+            */           
+           
+            return new ViewAsPdf("PdfAdv", viewModel);
+        }
+
 
         // Skicka Epost till Annonsör
         public IActionResult SendMsg(int? id)

@@ -1,0 +1,92 @@
+﻿@model ExArbeteJonas.ViewModels.AdvDetailsViewModel
+
+@{
+    Layout = null;
+}
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Prylmarknad Långfärdsskridskor</title>
+
+    <environment include="Development">
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
+        <link rel="stylesheet" href="~/css/site.css" />
+    </environment>
+    <environment exclude="Development">
+        <link rel="stylesheet" href="https://ajax.aspnetcdn.com/ajax/bootstrap/3.3.7/css/bootstrap.min.css"
+              asp-fallback-href="~/lib/bootstrap/dist/css/bootstrap.min.css"
+              asp-fallback-test-class="sr-only" asp-fallback-test-property="position" asp-fallback-test-value="absolute" />
+        <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
+    </environment>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.min.js"></script>
+    <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.2.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/jquery.ajax.unobtrusive/3.2.4/jquery.unobtrusive-ajax.min.js"></script>
+    <script src="~/lib/jquery/dist/jquery.js"></script>
+</head>
+<body>
+    <div class="container body-content">
+        <h1 class="ice-one">Prylmarknad Långfärdsskridskor</h1>
+        <h2 class="red-two">@Model.AdvType.Name</h2>
+        <h2 class="ice-two">@Model.Title</h2>
+        <div class="container">
+            <div class="col-md-4" align="center">
+                <h3 class="ice-three">Beskrivning</h3>
+                @Model.Description
+                <h3 class="ice-three">Annonsuppgifter:</h3>
+                <ul>
+                    <li>Annonsen inlagd: @Html.DisplayFor(m => @Model.StartDate)</li>
+                    <li>Pris: @Model.Price Kr</li>
+                    <li>Plats: @Model.Place</li>
+                </ul>
+            </div>
+            <div class="col-md-4" align="center">
+                <img src="~/Uploads/@Model.ImageFileName" alt="" class="img-responsive" />
+            </div>
+            <div class="col-md-4" align="center">
+                <h3 class="ice-three">Annonsör:</h3>
+                <ul>
+                    <li>Användarnamn: @Model.Member.UserName</li>
+                    @if (Model.Member.PhoneNumber != null)
+                    {
+                        <li>Telefon: @Model.Member.PhoneNumber</li>
+                    }
+                    <li>E-post: @Model.Member.Email</li>
+                </ul>
+                @if (@Model.Equipments.Count > 0)
+                {
+                    <h3 class="ice-three">Detaljuppgifter om utrustningen:</h3>
+                    foreach (var eq in Model.Equipments)
+                    {
+                        <ul>
+                            <li>Utrustningstyp: @eq.EqType.Name</li>
+                            <li>Märke: @eq.Make</li>
+                            @if (@eq.Model != null)
+                            {
+                                <li>Modell: @eq.Model</li>
+                            }
+                            @if (@eq.Size != null)
+                            {
+                                <li>Storlek: @eq.Size</li>
+                            }
+                            @if (@eq.Length != null)
+                            {
+                                <li>Längd: @eq.Length cm</li>
+                            }
+                        </ul>
+                    }
+
+                }
+                else
+                {
+                    <h3 class="ice-three">Inga detaljuppgifter om utrustningen</h3>
+                }
+            </div>
+        </div>
+        <br />
+        <div class="col-md-4" align="center">
+            <a asp-action="IndexAds">Gå tillbaka till sidan med alla annonser</a>
+        </div>
+    </div>
+</body>
+</html> 

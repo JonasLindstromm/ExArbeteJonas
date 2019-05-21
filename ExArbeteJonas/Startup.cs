@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Rotativa.AspNetCore;
 
 namespace ExArbeteJonas
 {   
@@ -67,6 +68,9 @@ namespace ExArbeteJonas
                     template: "{controller=Home}/{action=Index}"
                     );
             });
+
+            // Used to Generate Pdf
+            RotativaConfiguration.Setup(env);
 
             CreateRoles(serviceProvider).Wait();
         }
