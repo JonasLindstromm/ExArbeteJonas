@@ -1,9 +1,11 @@
 ﻿using ExArbeteJonas.DataLayer;
 using ExArbeteJonas.Models;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Mail;
@@ -15,7 +17,7 @@ namespace ExArbeteJonas.BusinessLayer
     {
         private IMarketData _marketData;
         private IHostingEnvironment _environment;
-        private readonly IConfiguration _config;
+        private readonly IConfiguration _config;       
 
         //Dependency Injection via konstruktorn
         public MarketBusiness(IMarketData marketData, IHostingEnvironment environment, IConfiguration config)
@@ -52,7 +54,7 @@ namespace ExArbeteJonas.BusinessLayer
 
         // Skapa en ny Regel för annonsering
         public string CreateAdvRule(AdvRule advRule)
-        {          
+        {
             return _marketData.CreateAdvRule(advRule);
         }
 
@@ -148,7 +150,7 @@ namespace ExArbeteJonas.BusinessLayer
 
         public List<AdvRule> GetRules()
         {
-            return _marketData.GetRules();            
+            return _marketData.GetRules();
         }
 
         // Läs all utrustning som är kopplad till en viss annons 
@@ -294,11 +296,11 @@ namespace ExArbeteJonas.BusinessLayer
                 eqTypeStatistics = new List<int>();
 
                 foreach (var adTypeName in adTypeNames)
-                {                    
+                {
                     var ads = currentAds.Where(a => a.AdvType.Name == adTypeName)
                        .Where(a => a.Equipments.Count == 1)
                        .Where(a => a.Equipments.First().EqType.Name == eqTypeName);
-                  
+
                     eqTypeStatistics.Add(ads.Count());
                 }
 
@@ -323,6 +325,18 @@ namespace ExArbeteJonas.BusinessLayer
         public List<Advertisement> GetUserAds(string UserId)
         {
             return _marketData.GetUserAds(UserId);
+        }
+
+        // Spara en bild som annonsören har laddat upp
+        public string SaveImage(IFormFile imageFile)
+        {
+
+            var uniqueFileName = GetUniqueFileName(imageFile.FileName);
+            var uploads = Path.Combine(_environment.WebRootPath, "Uploads");
+            var filePath = Path.Combine(uploads, uniqueFileName);
+            imageFile.CopyTo(new FileStream(filePath, FileMode.Create));
+
+            return uniqueFileName;
         }
 
         // Sök bland aktuella Annonser
@@ -451,6 +465,16 @@ namespace ExArbeteJonas.BusinessLayer
             }
 
             return sum / counter;
+        }
+
+        // Skapa ett unikt Filnamn
+        private string GetUniqueFileName(string fileName)
+        {
+            fileName = Path.GetFileName(fileName);
+            return Path.GetFileNameWithoutExtension(fileName)
+                      + "_"
+                      + Guid.NewGuid().ToString().Substring(0, 4)
+                      + Path.GetExtension(fileName);
         }
     }
 }

@@ -107,16 +107,11 @@ namespace ExArbeteJonas.Controllers
 
                 // Om medlemmen har laddat upp en bildfil
                 if (imageFile != null)
-                {
+                {                 
                     if (imageFile.Length > 0)
-                    {
-                        var uniqueFileName = GetUniqueFileName(imageFile.FileName);
-                        var uploads = Path.Combine(_hostingEnv.WebRootPath, "Uploads");
-                        var filePath = Path.Combine(uploads, uniqueFileName);
-                        imageFile.CopyTo(new FileStream(filePath, FileMode.Create));
-
-                        adv.ImageFileName = uniqueFileName;
-                    }
+                    {                      
+                        adv.ImageFileName = _businessLayer.SaveImage(imageFile);
+                    }                   
                 }
 
                 ApplicationUser user = await _userManager.FindByNameAsync(User.Identity.Name.ToLower());
@@ -210,14 +205,14 @@ namespace ExArbeteJonas.Controllers
             return View(viewModel);
         }
 
-        // Lägg till ny Regel
+        // Lägg till en ny Regel
         [Authorize(Roles = "Admin")]
         public IActionResult CreateAdvRule()
         {
             return View();
         }
 
-        // Lägg till ny Regel
+        // Lägg till en ny Regel
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
@@ -241,14 +236,14 @@ namespace ExArbeteJonas.Controllers
             return View(advRule);
         }
 
-        // Lägg till ny UtrustningsTyp
+        // Lägg till en ny UtrustningsTyp
         [Authorize(Roles = "Admin")]
         public IActionResult CreateEquipmentType()
         {
             return View();
         }
 
-        // Lägg till ny UtrustningsTyp
+        // Lägg till en ny UtrustningsTyp
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
@@ -272,7 +267,7 @@ namespace ExArbeteJonas.Controllers
             return View(eqType);
         }
 
-        // Visa statistik över Annonser
+        // Visa olika typer av statistik för Annonser
         [Authorize(Roles = "Admin")]
         public IActionResult CreateStatistics()
         {
@@ -284,7 +279,7 @@ namespace ExArbeteJonas.Controllers
             return View(viewModel);
         }
 
-        // Visa statistik över Annonser
+        // Visa olika typer av statistik för Annonser
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
@@ -327,7 +322,7 @@ namespace ExArbeteJonas.Controllers
             }
         }
 
-        // Ta bort annons
+        // Ta bort en egen annons
         [Authorize(Roles = "Admin")]
         public IActionResult DeleteAdv(int? id)
         {
@@ -344,14 +339,13 @@ namespace ExArbeteJonas.Controllers
                 return NotFound();
             }
 
-
             // Begär att BusinessLagret tar bort annonsen
             _businessLayer.DeleteAdv(adv);
 
             return RedirectToAction("IndexAds");
         }
 
-        // Ta bort egen annons
+        // Ta bort en egen annons
         [Authorize(Roles = "Member")]
         public async Task<IActionResult> DeleteOwnAdv(int? id)
         {
@@ -381,7 +375,7 @@ namespace ExArbeteJonas.Controllers
         }
 
 
-        // Ta bort en regel för annonser
+        // Ta bort en regel för annonsering
         [Authorize(Roles = "Admin")]
         public IActionResult DeleteAdvRule(int? id)
         {
@@ -435,7 +429,7 @@ namespace ExArbeteJonas.Controllers
             return View(viewModel);
         }
 
-        // Visa alla detaljer för en regel, i en Partial View
+        // Visa en hel regel, i en Partial View
         public IActionResult DetailsAdvRule(int id)
         {
             AdvRule advRule = _businessLayer.GetAdvRule(id);
@@ -486,17 +480,12 @@ namespace ExArbeteJonas.Controllers
             if (ModelState.IsValid)
             {
                 IFormFile imageFile = viewModel.MyImage;
-                // Om medlemmen har laddat upp en bildfil
+                // Om medlemmen har laddat upp en ny bildfil
                 if (imageFile != null)
-                {
+                {                   
                     if (imageFile.Length > 0)
-                    {
-                        var uniqueFileName = GetUniqueFileName(imageFile.FileName);
-                        var uploads = Path.Combine(_hostingEnv.WebRootPath, "Uploads");
-                        var filePath = Path.Combine(uploads, uniqueFileName);
-                        imageFile.CopyTo(new FileStream(filePath, FileMode.Create));
-
-                        viewModel.CurrentAdv.ImageFileName = uniqueFileName;
+                    {                       
+                        viewModel.CurrentAdv.ImageFileName = _businessLayer.SaveImage(imageFile);
                     }
                 }
 
@@ -560,7 +549,7 @@ namespace ExArbeteJonas.Controllers
             return View(viewModel);
         }
 
-        // Visa alla egna annonser   
+        // Visa medlemmens egna annonser   
         [Authorize(Roles = "Member")]
         public async Task<IActionResult> IndexOwnAds()
         {
@@ -615,7 +604,7 @@ namespace ExArbeteJonas.Controllers
             viewModel.ImageFileName = ad.ImageFileName;
             viewModel.Equipments = _businessLayer.GetEquipment((int)(id));
 
-            /*
+            /*  Fungerar inte att sätta CustomSwitches 
             var pdfResult = new ViewAsPdf("PdfAdv", viewModel);
             {
                 CustomSwitches = "--page-offset 0 --footer-center [page] --footer-font-size 12"

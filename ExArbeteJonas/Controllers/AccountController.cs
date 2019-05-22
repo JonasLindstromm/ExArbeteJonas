@@ -44,9 +44,19 @@ namespace ExArbeteJonas.Controllers
                 return NotFound();
             }
 
-            UserViewModel viewModel = new UserViewModel();
-            viewModel.UserName = user.UserName;
+            UserViewModel viewModel = new UserViewModel();            
             viewModel.Id = user.Id;
+            viewModel.Name = user.Name;
+            viewModel.UserName = user.UserName;
+            viewModel.Email = user.Email;
+            if (await _userManager.IsInRoleAsync(user, "Member"))
+            {
+                viewModel.RoleName = "Member";
+            }
+            else
+            {
+                viewModel.RoleName = "Admin";
+            }           
 
             return View(viewModel);
         }

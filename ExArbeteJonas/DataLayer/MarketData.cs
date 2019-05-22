@@ -83,22 +83,9 @@ namespace ExArbeteJonas.DataLayer
 
         // Hämta en regel för annonsering
         public AdvRule GetAdvRule(int id)
-        {
-           
+        {           
             return _context.AdvRule              
-              .SingleOrDefault(m => m.Id == id);
-             
-
-
-            // Dummy Code   
-            /*
-            var rule = new AdvRule();
-            rule.Title = "NNNNNNNNN NNNNNNNNN NNNNNNNNN ";
-            rule.Description =
-                "NNNNNNNNN NNNNNNNNN NNNNNNNNN NNNNNNNNN NNNNNNNNN NNNNNNNNN";
-          
-            return rule;
-            */
+              .SingleOrDefault(m => m.Id == id);   
         }
 
         // Läs namnen på existerande Annonstyper
@@ -144,19 +131,7 @@ namespace ExArbeteJonas.DataLayer
         // Hämta alla regler för Annonsering
         public List<AdvRule> GetRules()
         {
-            return _context.AdvRule.ToList();
-
-            // Dummy Code 
-            /*
-            var rules = new List<AdvRule>();
-            var rule = new AdvRule();
-            rule.Title = "NNNNNNNNN NNNNNNNNN NNNNNNNNN ";
-            rule.Description =
-                "NNNNNNNNN NNNNNNNNN NNNNNNNNN NNNNNNNNN NNNNNNNNN NNNNNNNNN";
-            rules.Add(rule);
-            return rules;
-            */
-            
+            return _context.AdvRule.ToList();            
         }
 
         // Hämta utrustning för en viss annons

@@ -1,10 +1,32 @@
 ﻿@model ExArbeteJonas.ViewModels.CreateEqViewModel
 
 <h2 class="ice-two">Din nya annons innehåller dessa Uppgifter: </h2>
+<h2 class="red-two">@Model.CurrentAdv.AdvType.Name</h2>
+<h2 class="ice-two">@Model.CurrentAdv.Title</h2>
 <div class="container">
     <div class="col-md-4" align="center">
-        <h3 class="ice-three">@Model.CurrentAdv.AdvType.Name</h3>
-        <h3 class="ice-three">@Model.CurrentAdv.Title</h3>
+        <h3 class="ice-three">Beskrivning</h3>
+        @Model.CurrentAdv.Description
+        <h3 class="ice-three">Annonsuppgifter:</h3>
+        <ul>
+            <li>Annonsen inlagd: @Html.DisplayFor(m => @Model.CurrentAdv.StartDate)</li>
+            <li>Pris: @Model.CurrentAdv.Price Kr</li>
+            <li>Plats: @Model.CurrentAdv.Place</li>
+        </ul>
+    </div>
+    <div class="col-md-4" align="center">
+        <img src="~/Uploads/@Model.CurrentAdv.ImageFileName" alt="" class="img-responsive" />
+    </div>
+    <div class="col-md-4" align="center">
+        <h3 class="ice-three">Annonsör:</h3>
+        <ul>
+            <li>Användarnamn: @Model.CurrentAdv.Member.UserName</li>
+            @if (Model.CurrentAdv.Member.PhoneNumber != null)
+            {
+                <li>Telefon: @Model.CurrentAdv.Member.PhoneNumber</li>
+            }
+            <li>E-post: @Model.CurrentAdv.Member.Email</li>
+        </ul>
         @if (@Model.ExistingEqm.Count > 0)
         {
             <h3 class="ice-three">Detaljuppgifter om utrustningen:</h3>
@@ -28,22 +50,10 @@
                 </ul>
             }
         }
-    </div>
-    <div class="col-md-4" align="center">
-        <h3 class="ice-three">Beskrivning</h3>
-        @Model.CurrentAdv.Description
-        <img src="~/Uploads/@Model.CurrentAdv.ImageFileName" alt="" class="img-responsive" />
-    </div>
-    <div class="col-md-4" align="center">
-        <h3 class="ice-three">Annonsuppgifter:</h3>
-        <ul>
-            <li>Annonsen inlagd: @Html.DisplayFor(m => @Model.CurrentAdv.StartDate)</li>
-            <li>Pris: @Model.CurrentAdv.Price Kr</li>
-            @if (Model.CurrentAdv.Place != null)
-            {
-                <li>Finns i: @Model.CurrentAdv.Place</li>
-            }
-        </ul>
+        else
+        {
+            <h3 class="ice-three">Inga detaljuppgifter om utrustningen</h3>
+        }
     </div>
 </div>
 <br />
@@ -92,7 +102,7 @@
                     <span asp-validation-for="CurrentEqm.Length" class="text-danger"></span>
                 </div>
                 <div class="form-group" align="center">
-                    <input type="submit" value="Lägg till uppgifter om Utrustning" class="btn btn-info" />
+                    <input type="submit" value="Lägg till uppgifter om Utrustning till Annonsen" class="btn btn-info" />
                 </div>
             </form>
         </div>

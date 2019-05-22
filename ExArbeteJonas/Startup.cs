@@ -75,6 +75,7 @@ namespace ExArbeteJonas
             CreateRoles(serviceProvider).Wait();
         }
 
+        // Skapa rollerna Admin och Member
         private async Task CreateRoles(IServiceProvider serviceProvider)
         {
             var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
