@@ -34,6 +34,22 @@ namespace ExArbeteJonas.DataLayer
             return "OK";
         }
 
+        // Spara en borttagen annons i Databasen  
+        public string CreateRemovedAdv(RemovedAdv remAdv)
+        {
+            _context.Add(remAdv);
+            _context.SaveChanges();
+            return "OK";
+        }
+
+        // Spara en borttagen utrustning i Databasen  
+        public string CreateRemovedEqm(RemovedEqm remEqm)
+        {
+            _context.Add(remEqm);
+            _context.SaveChanges();
+            return "OK";
+        }
+
         // Skapa en regel för annonsering
         public string CreateAdvRule(AdvRule advRule)
         {            
@@ -126,6 +142,22 @@ namespace ExArbeteJonas.DataLayer
         public List<Equipment> GetCurrentEquipments()
         {
             return _context.Equipment.Include(e => e.EqType).Include(e => e.ActualAd.AdvType).ToList();
+        }
+
+        // Hämta alla borttagna annonser
+        public List<RemovedAdv> GetRemovedAds()
+        {
+            var allAds = _context.RemovedAdv.Include(a => a.AdvType)
+                .Include(a => a.RemovedEqms);
+
+            // Sortera annonserna i tidsordning                    
+            return allAds.OrderBy(p => p.StartDate).ToList();
+        }
+
+        // Hämta alla borttagna Utrustningar
+        public List<RemovedEqm> GetRemovedEquipments()
+        {
+            return _context.RemovedEqm.Include(e => e.EqType).Include(e => e.RemovedAd.AdvType).ToList();
         }
 
         // Hämta alla regler för Annonsering

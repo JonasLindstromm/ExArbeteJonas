@@ -14,7 +14,9 @@ namespace ExArbeteJonas.Models
         public virtual DbSet<Advertisement> Advertisement { get; set; }
         public virtual DbSet<AdvRule> AdvRule { get; set; }
         public virtual DbSet<Equipment> Equipment { get; set; }
-        public virtual DbSet<EquipmentType> EquipmentType { get; set; }       
+        public virtual DbSet<EquipmentType> EquipmentType { get; set; }
+        public virtual DbSet<RemovedAdv> RemovedAdv { get; set; }
+        public virtual DbSet<RemovedEqm> RemovedEqm { get; set; }
 
         public MarketContext(DbContextOptions<MarketContext> options)
           : base(options)

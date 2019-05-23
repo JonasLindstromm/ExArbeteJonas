@@ -33,6 +33,7 @@ namespace ExArbeteJonas.BusinessLayer
         string UpdateAdv(Advertisement adv);
         IDictionary<string, List<int>> GetAgeAdsStatistics(List<string> eqTypeNames, List<string> adTypeNames);
         IDictionary<string, List<int>> GetNrAdsStatistics(List<string> eqTypeNames, List<string> adTypeNames);
+        IDictionary<string, List<int>> GetNrDeletedAdsStatistics(List<string> eqTypeNames, List<string> adTypeNames);
         IDictionary<string, List<int>> GetPriceAdsStatistics(List<string> eqTypeNames, List<string> adTypeNames);
         string SaveImage(IFormFile imageFile);
     }

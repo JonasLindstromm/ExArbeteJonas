@@ -1,7 +1,9 @@
 ﻿using ExArbeteJonas.DataLayer;
+using ExArbeteJonas.IdentityData;
 using ExArbeteJonas.Models;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -15,16 +17,18 @@ namespace ExArbeteJonas.BusinessLayer
 {
     public class MarketBusiness : IMarketBusiness
     {
+        private readonly Microsoft.AspNetCore.Identity.UserManager<ApplicationUser> _userManager;
         private IMarketData _marketData;
         private IHostingEnvironment _environment;
         private readonly IConfiguration _config;       
 
         //Dependency Injection via konstruktorn
-        public MarketBusiness(IMarketData marketData, IHostingEnvironment environment, IConfiguration config)
+        public MarketBusiness(IMarketData marketData, IHostingEnvironment environment, IConfiguration config, UserManager<ApplicationUser> userManager)
         {
             _marketData = marketData;
             _environment = environment;
             _config = config;
+            _userManager = userManager;
         }
 
         // Skapa en Annonstyp
@@ -86,6 +90,7 @@ namespace ExArbeteJonas.BusinessLayer
         // Ta bort en annons
         public void DeleteAdv(Advertisement adv)
         {
+            CopyToRemovedAdv(adv);            
             _marketData.DeleteAdv(adv);
         }
 
@@ -102,6 +107,7 @@ namespace ExArbeteJonas.BusinessLayer
 
             foreach (var adv in memberAds)
             {
+                CopyToRemovedAdv(adv);
                 _marketData.DeleteAdv(adv);
             }
         }
@@ -114,6 +120,7 @@ namespace ExArbeteJonas.BusinessLayer
             var oldAds = currentAds.Where(a => (a.StartDate < DateTime.Now.AddMonths(-1)));
             foreach (var adv in oldAds)
             {
+                CopyToRemovedAdv(adv);
                 _marketData.DeleteAdv(adv);
             }
         }
@@ -321,6 +328,57 @@ namespace ExArbeteJonas.BusinessLayer
             return statistics;
         }
 
+
+        // Ta fram statistik över antalet borttagna annonser av olika typer
+        public IDictionary<string, List<int>> GetNrDeletedAdsStatistics(List<string> eqTypeNames, List<string> adTypeNames)
+        {
+            var statistics = new Dictionary<string, List<int>>();
+
+            var removedAds = _marketData.GetRemovedAds();
+            var removedEquipments = _marketData.GetRemovedEquipments();
+
+            var eqTypeStatistics = new List<int>();
+
+            // Räkna antalet annonser där utrustningen är ospecificerad
+            foreach (var adTypeName in adTypeNames)
+            {
+                int count = removedAds.Where(a => a.AdvType.Name == adTypeName)
+                    .Where(a => a.RemovedEqms.Count == 0).Count();
+                eqTypeStatistics.Add(count);
+            }
+            statistics.Add("Odefinerade", eqTypeStatistics);
+
+            // Räkna antalet annonser där en utrustning är specificerad
+            foreach (var eqTypeName in eqTypeNames)
+            {
+                eqTypeStatistics = new List<int>();
+
+                foreach (var adTypeName in adTypeNames)
+                {
+                    var ads = removedAds.Where(a => a.AdvType.Name == adTypeName)
+                       .Where(a => a.RemovedEqms.Count == 1)
+                       .Where(a => a.RemovedEqms.First().EqType.Name == eqTypeName);
+
+                    eqTypeStatistics.Add(ads.Count());
+                }
+
+                statistics.Add(eqTypeName, eqTypeStatistics);
+            }
+
+            eqTypeStatistics = new List<int>();
+
+            // Räkna antalet annonser där utrustningen är ett paket
+            foreach (var adTypeName in adTypeNames)
+            {
+                int count = removedAds.Where(a => a.AdvType.Name == adTypeName)
+                    .Where(a => a.RemovedEqms.Count == 2).Count();
+                eqTypeStatistics.Add(count);
+            }
+            statistics.Add("Paket", eqTypeStatistics);
+
+            return statistics;
+        }
+
         // Läs alla annonser som en viss användare har lagt in
         public List<Advertisement> GetUserAds(string UserId)
         {
@@ -475,6 +533,43 @@ namespace ExArbeteJonas.BusinessLayer
                       + "_"
                       + Guid.NewGuid().ToString().Substring(0, 4)
                       + Path.GetExtension(fileName);
+        }
+
+        // Save data for a Removed Advertisement 
+        private async void CopyToRemovedAdv(Advertisement adv)
+        {
+            ApplicationUser user = await _userManager.FindByIdAsync(adv.MemberId);
+           
+            RemovedAdv remAdv = new RemovedAdv();
+            remAdv.MemberName = user.UserName;
+            remAdv.AdvTypeId = adv.AdvTypeId;
+            remAdv.Title = adv.Title;
+            remAdv.Description = adv.Description;
+            remAdv.Price = adv.Price;
+            remAdv.Place = adv.Place;
+            remAdv.StartDate = adv.StartDate;
+            remAdv.EndDate = DateTime.Now;
+            remAdv.ImageFileName = adv.ImageFileName;
+            _marketData.CreateRemovedAdv(remAdv);
+
+            var Equipments = _marketData.GetEquipment(adv.Id);
+            foreach (var eqm in Equipments)
+            {
+                CopyToRemovedEqm(eqm, remAdv.Id);
+            }           
+        }
+
+        // Save data for a Removed equipment 
+        private void CopyToRemovedEqm(Equipment eqm, int remAdvId)
+        {
+            RemovedEqm remEqm = new RemovedEqm();
+            remEqm.RemovedAdId = remAdvId;
+            remEqm.EqTypeId = eqm.EqTypeId;
+            remEqm.Make = eqm.Make;
+            remEqm.Model = eqm.Model;
+            remEqm.Size = eqm.Size;
+            remEqm.Length = eqm.Length;
+            _marketData.CreateRemovedEqm(remEqm);
         }
     }
 }

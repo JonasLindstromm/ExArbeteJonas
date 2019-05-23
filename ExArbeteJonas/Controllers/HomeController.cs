@@ -275,7 +275,7 @@ namespace ExArbeteJonas.Controllers
             viewModel.StatisticsTypes.Add(new SelectListItem { Text = "Statistik över antal aktuella annonser", Value = "1" });
             viewModel.StatisticsTypes.Add(new SelectListItem { Text = "Statistik över genomsnittligt antal dagar för aktuella annonser", Value = "2" });
             viewModel.StatisticsTypes.Add(new SelectListItem { Text = "Statistik över genomsnittligt pris för aktuella annonser", Value = "3" });
-
+            viewModel.StatisticsTypes.Add(new SelectListItem { Text = "Statistik över antal borttagna annonser", Value = "4" });
             return View(viewModel);
         }
 
@@ -285,40 +285,30 @@ namespace ExArbeteJonas.Controllers
         [Authorize(Roles = "Admin")]
         public IActionResult CreateStatistics(CreateStatisticsViewModel viewModel)
         {
+            StatisticsAdsViewModel statvM = new StatisticsAdsViewModel();
+            var adTypeNames = _businessLayer.GetAdvTypeNames();
+            statvM.AdTypeNames = adTypeNames;
+            var eqTypeNames = _businessLayer.GetEquipmentTypeNames();
+            statvM.EqTypeNames = eqTypeNames;
             if (viewModel.TypeId == 1)
             {
-                StatisticsAdsViewModel statvM = new StatisticsAdsViewModel();
-                var adTypeNames = _businessLayer.GetAdvTypeNames();
-                statvM.AdTypeNames = adTypeNames;
-                var eqTypeNames = _businessLayer.GetEquipmentTypeNames();
-                statvM.EqTypeNames = eqTypeNames;
-
                 statvM.Statistics = _businessLayer.GetNrAdsStatistics(eqTypeNames, adTypeNames);
-
                 return PartialView("_StatisticsAdsPartial", statvM);
             }
             else if (viewModel.TypeId == 2)
             {
-                StatisticsAdsViewModel statvM = new StatisticsAdsViewModel();
-                var adTypeNames = _businessLayer.GetAdvTypeNames();
-                statvM.AdTypeNames = adTypeNames;
-                var eqTypeNames = _businessLayer.GetEquipmentTypeNames();
-                statvM.EqTypeNames = eqTypeNames;
-
                 statvM.Statistics = _businessLayer.GetAgeAdsStatistics(eqTypeNames, adTypeNames);
-
                 return PartialView("_StatisticsAgeAdsPartial", statvM);
             }
-            else  //  viewModel.TypeId == 3
-            {
-                StatisticsAdsViewModel statvM = new StatisticsAdsViewModel();
-                var adTypeNames = _businessLayer.GetAdvTypeNames();
-                statvM.AdTypeNames = adTypeNames;
-                var eqTypeNames = _businessLayer.GetEquipmentTypeNames();
-                statvM.EqTypeNames = eqTypeNames;
-
+            else if  (viewModel.TypeId == 3)
+            {  
                 statvM.Statistics = _businessLayer.GetPriceAdsStatistics(eqTypeNames, adTypeNames);
                 return PartialView("_StatisticsPriceAdsPartial", statvM);
+            }
+            else // viewModel.TypeId == 4
+            {
+                statvM.Statistics = _businessLayer.GetNrDeletedAdsStatistics(eqTypeNames, adTypeNames);
+                return PartialView("_StatisticsAdsPartial", statvM);
             }
         }
 
@@ -616,7 +606,6 @@ namespace ExArbeteJonas.Controllers
             return new ViewAsPdf("PdfAdv", viewModel);
         }
 
-
         // Skicka Epost till Annonsör
         public IActionResult SendMsg(int? id)
         {
@@ -654,8 +643,6 @@ namespace ExArbeteJonas.Controllers
             viewModel.AdvTitle = adv.Title;
             viewModel.AdvTypeName = adv.AdvType.Name;
             viewModel.UserName = adv.Member.UserName;
-
-
             return View(viewModel);
         }
 
