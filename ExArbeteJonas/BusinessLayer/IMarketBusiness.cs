@@ -32,9 +32,10 @@ namespace ExArbeteJonas.BusinessLayer
         void SendEmail(string mailSubject, string mailText, string receiver);
         string UpdateAdv(Advertisement adv);
         IDictionary<string, List<int>> GetAgeAdsStatistics(List<string> eqTypeNames, List<string> adTypeNames);
+        IDictionary<string, List<int>> GetAgeDeletedAdsStatistics(List<string> eqTypeNames, List<string> adTypeNames);
         IDictionary<string, List<int>> GetNrAdsStatistics(List<string> eqTypeNames, List<string> adTypeNames);
         IDictionary<string, List<int>> GetNrDeletedAdsStatistics(List<string> eqTypeNames, List<string> adTypeNames);
         IDictionary<string, List<int>> GetPriceAdsStatistics(List<string> eqTypeNames, List<string> adTypeNames);
-        string SaveImage(IFormFile imageFile);
+        string SaveImage(IFormFile imageFile);        
     }
 }

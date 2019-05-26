@@ -21,7 +21,7 @@
                     </th>
                     <th></th>
                 </tr>
-            </thead>            
+            </thead>
             <tbody>
                 @foreach (var item in Model.CurrentAds)
                 {
@@ -53,7 +53,7 @@
                                 }
                             }
                             <a asp-action="DetailsAdv" asp-route-id="@item.Id">Visa hela annonsen |</a>
-                            <a asp-action="PdfAdv" asp-route-id="@item.Id">Visa Pdf</a>
+                            <a asp-action="PdfAdv" asp-route-id="@item.Id">Kopiera till Pdf</a>
                         </td>
                     </tr>
                 }
@@ -61,4 +61,6 @@
         </table>
     }
 }
+<div id="ViewPdf"></div>
+
 

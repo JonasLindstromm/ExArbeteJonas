@@ -20,7 +20,7 @@ namespace ExArbeteJonas.BusinessLayer
         private readonly Microsoft.AspNetCore.Identity.UserManager<ApplicationUser> _userManager;
         private IMarketData _marketData;
         private IHostingEnvironment _environment;
-        private readonly IConfiguration _config;       
+        private readonly IConfiguration _config;
 
         //Dependency Injection via konstruktorn
         public MarketBusiness(IMarketData marketData, IHostingEnvironment environment, IConfiguration config, UserManager<ApplicationUser> userManager)
@@ -90,7 +90,7 @@ namespace ExArbeteJonas.BusinessLayer
         // Ta bort en annons
         public void DeleteAdv(Advertisement adv)
         {
-            CopyToRemovedAdv(adv);            
+            CopyToRemovedAdv(adv);
             _marketData.DeleteAdv(adv);
         }
 
@@ -228,6 +228,56 @@ namespace ExArbeteJonas.BusinessLayer
             return statistics;
         }
 
+        // Ta fram statistik över antalet dagar för borttagna annonser av olika typer
+        public IDictionary<string, List<int>> GetAgeDeletedAdsStatistics(List<string> eqTypeNames, List<string> adTypeNames)
+        {
+            var statistics = new Dictionary<string, List<int>>();
+
+            var removedAds = _marketData.GetRemovedAds();
+            var removedEquipments = _marketData.GetRemovedEquipments();
+
+            var eqTypeStatistics = new List<int>();
+
+            // Räkna antalet dagar för gamla annonser där utrustningen är ospecificerad
+            foreach (var adTypeName in adTypeNames)
+            {
+                var ads = removedAds.Where(a => a.AdvType.Name == adTypeName)
+                    .Where(a => a.RemovedEqms.Count == 0);
+                eqTypeStatistics.Add(CalculateAverageNrDays(ads));
+            }
+            statistics.Add("Odefinerade", eqTypeStatistics);
+
+            // Räkna antalet dagar för gamla annonser där utrustningen är specificerad
+            foreach (var eqTypeName in eqTypeNames)
+            {
+                eqTypeStatistics = new List<int>();
+
+                var equipments = removedEquipments.Where(e => e.EqType.Name == eqTypeName);
+
+                foreach (var adTypeName in adTypeNames)
+                {
+                    var ads = removedAds.Where(a => a.AdvType.Name == adTypeName)
+                        .Where(a => a.RemovedEqms.Count == 1)
+                        .Where(a => a.RemovedEqms.First().EqType.Name == eqTypeName);
+                    eqTypeStatistics.Add(CalculateAverageNrDays(ads));
+                }
+                statistics.Add(eqTypeName, eqTypeStatistics);
+            }
+
+            eqTypeStatistics = new List<int>();
+
+            // Räkna antalet dagar för gamla annonser där utrustningen är ett paket
+            foreach (var adTypeName in adTypeNames)
+            {
+                var ads = removedAds.Where(a => a.AdvType.Name == adTypeName)
+                   .Where(a => a.RemovedEqms.Count == 2);
+                eqTypeStatistics.Add(CalculateAverageNrDays(ads));
+            }
+            statistics.Add("Paket", eqTypeStatistics);
+
+            return statistics;
+        }
+
         // Ta fram statistik över angivet pris för annonser av olika typer
         public IDictionary<string, List<int>> GetPriceAdsStatistics(List<string> eqTypeNames, List<string> adTypeNames)
         {
@@ -273,7 +323,6 @@ namespace ExArbeteJonas.BusinessLayer
                 eqTypeStatistics.Add(CalculateAveragePrice(ads));
             }
             statistics.Add("Paket", eqTypeStatistics);
-
 
             return statistics;
         }
@@ -327,7 +376,6 @@ namespace ExArbeteJonas.BusinessLayer
 
             return statistics;
         }
-
 
         // Ta fram statistik över antalet borttagna annonser av olika typer
         public IDictionary<string, List<int>> GetNrDeletedAdsStatistics(List<string> eqTypeNames, List<string> adTypeNames)
@@ -507,7 +555,26 @@ namespace ExArbeteJonas.BusinessLayer
             return sum / counter;
         }
 
-        // Beräkna genomsnittligt pris för annonser
+
+        // Beräkna genomsnittligt antal dagar för borttagna annonser
+        private int CalculateAverageNrDays(IEnumerable<RemovedAdv> ads)
+        {
+            if (ads.Count() == 0)
+            {
+                return 0;
+            }
+            int counter = 0;
+            int sum = 0;
+            foreach (var ad in ads)
+            {
+                counter++;
+                sum += (ad.EndDate - ad.StartDate).Days;
+            }
+
+            return sum / counter;
+        }
+
+        // Beräkna genomsnittligt pris för aktuella annonser
         private int CalculateAveragePrice(IEnumerable<Advertisement> ads)
         {
             if (ads.Count() == 0)
@@ -525,6 +592,7 @@ namespace ExArbeteJonas.BusinessLayer
             return sum / counter;
         }
 
+
         // Skapa ett unikt Filnamn
         private string GetUniqueFileName(string fileName)
         {
@@ -539,7 +607,7 @@ namespace ExArbeteJonas.BusinessLayer
         private async void CopyToRemovedAdv(Advertisement adv)
         {
             ApplicationUser user = await _userManager.FindByIdAsync(adv.MemberId);
-           
+
             RemovedAdv remAdv = new RemovedAdv();
             remAdv.MemberName = user.UserName;
             remAdv.AdvTypeId = adv.AdvTypeId;
@@ -556,7 +624,7 @@ namespace ExArbeteJonas.BusinessLayer
             foreach (var eqm in Equipments)
             {
                 CopyToRemovedEqm(eqm, remAdv.Id);
-            }           
+            }
         }
 
         // Save data for a Removed equipment 

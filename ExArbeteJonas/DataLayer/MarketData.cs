@@ -11,7 +11,7 @@ namespace ExArbeteJonas.DataLayer
     {
         private MarketContext _context;
 
-        //Dependency Injection av Contextklassen via konstruktorn,'
+        // Dependency Injection av Contextklassen via konstruktorn,'
         // för att kunna göra anrop mot databasen 
         public MarketData(MarketContext context)
         {

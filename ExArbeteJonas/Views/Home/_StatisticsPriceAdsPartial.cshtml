@@ -1,10 +1,10 @@
 ﻿@model ExArbeteJonas.ViewModels.StatisticsAdsViewModel
 
-<h3 class="ice-three">Statistik över genomsnittligt pris för aktuella annonser:</h3>
+<h3 class="ice-three">@Model.Heading</h3>
 <table class="table">
     <thead>
         <tr>
-            <th>Antal dagar</th>
+            <th>Pris</th>
             @foreach (var adType in Model.AdTypeNames)
             {
                 <th>@adType</th>

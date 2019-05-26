@@ -107,11 +107,11 @@ namespace ExArbeteJonas.Controllers
 
                 // Om medlemmen har laddat upp en bildfil
                 if (imageFile != null)
-                {                 
+                {
                     if (imageFile.Length > 0)
-                    {                      
+                    {
                         adv.ImageFileName = _businessLayer.SaveImage(imageFile);
-                    }                   
+                    }
                 }
 
                 ApplicationUser user = await _userManager.FindByNameAsync(User.Identity.Name.ToLower());
@@ -276,6 +276,7 @@ namespace ExArbeteJonas.Controllers
             viewModel.StatisticsTypes.Add(new SelectListItem { Text = "Statistik över genomsnittligt antal dagar för aktuella annonser", Value = "2" });
             viewModel.StatisticsTypes.Add(new SelectListItem { Text = "Statistik över genomsnittligt pris för aktuella annonser", Value = "3" });
             viewModel.StatisticsTypes.Add(new SelectListItem { Text = "Statistik över antal borttagna annonser", Value = "4" });
+            viewModel.StatisticsTypes.Add(new SelectListItem { Text = "Statistik över genomsnittligt antal dagar för borttagna annonser", Value = "5" });
             return View(viewModel);
         }
 
@@ -290,26 +291,30 @@ namespace ExArbeteJonas.Controllers
             statvM.AdTypeNames = adTypeNames;
             var eqTypeNames = _businessLayer.GetEquipmentTypeNames();
             statvM.EqTypeNames = eqTypeNames;
-            if (viewModel.TypeId == 1)
+            switch (viewModel.TypeId)
             {
-                statvM.Statistics = _businessLayer.GetNrAdsStatistics(eqTypeNames, adTypeNames);
-                return PartialView("_StatisticsAdsPartial", statvM);
+                case 1:
+                    statvM.Heading = "Statistik över antal aktuella Annonser:";
+                    statvM.Statistics = _businessLayer.GetNrAdsStatistics(eqTypeNames, adTypeNames);
+                    return PartialView("_StatisticsNrAdsPartial", statvM);
+                case 2:
+                    statvM.Heading = "Statistik över genomsnittligt antal dagar för aktuella annonser:";
+                    statvM.Statistics = _businessLayer.GetAgeAdsStatistics(eqTypeNames, adTypeNames);
+                    return PartialView("_StatisticsAgeAdsPartial", statvM);
+                case 3:
+                    statvM.Heading = "Statistik över genomsnittligt pris för aktuella annonser:";
+                    statvM.Statistics = _businessLayer.GetPriceAdsStatistics(eqTypeNames, adTypeNames);
+                    return PartialView("_StatisticsPriceAdsPartial", statvM);
+                case 4:
+                    statvM.Heading = "Statistik över antal borttagna Annonser:";
+                    statvM.Statistics = _businessLayer.GetNrDeletedAdsStatistics(eqTypeNames, adTypeNames);
+                    return PartialView("_StatisticsNrAdsPartial", statvM);
+                default:  // viewModel.TypeId == 5
+                    statvM.Heading = "Statistik över genomsnittligt antal dagar för borttagna annonser:";
+                    statvM.Statistics = _businessLayer.GetAgeDeletedAdsStatistics(eqTypeNames, adTypeNames);
+                    return PartialView("_StatisticsAgeAdsPartial", statvM);
             }
-            else if (viewModel.TypeId == 2)
-            {
-                statvM.Statistics = _businessLayer.GetAgeAdsStatistics(eqTypeNames, adTypeNames);
-                return PartialView("_StatisticsAgeAdsPartial", statvM);
-            }
-            else if  (viewModel.TypeId == 3)
-            {  
-                statvM.Statistics = _businessLayer.GetPriceAdsStatistics(eqTypeNames, adTypeNames);
-                return PartialView("_StatisticsPriceAdsPartial", statvM);
-            }
-            else // viewModel.TypeId == 4
-            {
-                statvM.Statistics = _businessLayer.GetNrDeletedAdsStatistics(eqTypeNames, adTypeNames);
-                return PartialView("_StatisticsAdsPartial", statvM);
-            }
+           
         }
 
         // Ta bort en egen annons
@@ -472,9 +477,9 @@ namespace ExArbeteJonas.Controllers
                 IFormFile imageFile = viewModel.MyImage;
                 // Om medlemmen har laddat upp en ny bildfil
                 if (imageFile != null)
-                {                   
+                {
                     if (imageFile.Length > 0)
-                    {                       
+                    {
                         viewModel.CurrentAdv.ImageFileName = _businessLayer.SaveImage(imageFile);
                     }
                 }
@@ -594,19 +599,19 @@ namespace ExArbeteJonas.Controllers
             viewModel.ImageFileName = ad.ImageFileName;
             viewModel.Equipments = _businessLayer.GetEquipment((int)(id));
 
-            /*  Fungerar inte att sätta CustomSwitches 
+            /*  Fungerar inte att sätta CustomSwitches och FileName
             var pdfResult = new ViewAsPdf("PdfAdv", viewModel);
             {
                 CustomSwitches = "--page-offset 0 --footer-center [page] --footer-font-size 12"
                 FileName = "";
             };
             return pdfResult;
-            */           
-           
+            */
+
             return new ViewAsPdf("PdfAdv", viewModel);
         }
 
-        // Skicka Epost till Annonsör
+        // Skicka Meddelande med Epost till Annonsör
         public IActionResult SendMsg(int? id)
         {
             if (id == null)
@@ -623,7 +628,7 @@ namespace ExArbeteJonas.Controllers
             viewModel.AdvTypeName = adv.AdvType.Name;
             viewModel.UserName = adv.Member.UserName;
 
-            return View(viewModel);
+            return PartialView("_SendMsgPartial", viewModel);
         }
 
         // Skicka Epost till annonsör
@@ -717,15 +722,6 @@ namespace ExArbeteJonas.Controllers
             }
 
             return View(vM);
-        }
-
-        private string GetUniqueFileName(string fileName)
-        {
-            fileName = Path.GetFileName(fileName);
-            return Path.GetFileNameWithoutExtension(fileName)
-                      + "_"
-                      + Guid.NewGuid().ToString().Substring(0, 4)
-                      + Path.GetExtension(fileName);
         }
 
         // Visa felmeddelande

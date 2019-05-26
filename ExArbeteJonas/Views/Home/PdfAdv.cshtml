@@ -25,6 +25,8 @@
     <script src="~/lib/jquery/dist/jquery.js"></script>
 </head>
 <body>
+    <a asp-action="IndexAds">Länk till sidan med alla annonser</a>
+    <br/>
     <div class="container body-content">
         <h1 class="ice-one">Prylmarknad Långfärdsskridskor</h1>
         <h2 class="red-two">@Model.AdvType.Name</h2>
@@ -82,11 +84,7 @@
                     <h3 class="ice-three">Inga detaljuppgifter om utrustningen</h3>
                 }
             </div>
-        </div>
-        <br />
-        <div class="col-md-4" align="center">
-            <a asp-action="IndexAds">Gå tillbaka till sidan med alla annonser</a>
-        </div>
+        </div>        
     </div>
 </body>
 </html> 
