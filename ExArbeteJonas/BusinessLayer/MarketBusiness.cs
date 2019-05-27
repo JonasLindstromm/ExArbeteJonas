@@ -532,6 +532,7 @@ namespace ExArbeteJonas.BusinessLayer
             client.Send(sender, receiver, mailSubject, mailText);
         }
 
+        // Uppdatera en annons
         public string UpdateAdv(Advertisement adv)
         {
             return _marketData.UpdateAdv(adv);
@@ -554,7 +555,6 @@ namespace ExArbeteJonas.BusinessLayer
 
             return sum / counter;
         }
-
 
         // Beräkna genomsnittligt antal dagar för borttagna annonser
         private int CalculateAverageNrDays(IEnumerable<RemovedAdv> ads)
@@ -617,7 +617,19 @@ namespace ExArbeteJonas.BusinessLayer
             remAdv.Place = adv.Place;
             remAdv.StartDate = adv.StartDate;
             remAdv.EndDate = DateTime.Now;
-            remAdv.ImageFileName = adv.ImageFileName;
+
+            // Don't copy the Image to Removed Advertisements
+            remAdv.ImageFileName = "";
+
+            // Delete the Image File
+            var uploads = Path.Combine(_environment.WebRootPath, "Uploads");
+            var filePath = Path.Combine(uploads, adv.ImageFileName);
+            if (File.Exists(filePath))
+            {
+                File.Delete(filePath);
+            }
+
+
             _marketData.CreateRemovedAdv(remAdv);
 
             var Equipments = _marketData.GetEquipment(adv.Id);

@@ -59,7 +59,7 @@ namespace ExArbeteJonas.Controllers
                 string result = _businessLayer.CreateAdType(adType);
                 if (result == "OK")
                 {
-                    return RedirectToAction("IndexTypes");
+                    return RedirectToAction("IndexAdmin");
                 }
                 else
                 {
@@ -140,6 +140,37 @@ namespace ExArbeteJonas.Controllers
             return View(viewModel);
         }
 
+        // Lägg till en ny Regel
+        [Authorize(Roles = "Admin")]
+        public IActionResult CreateAdvRule()
+        {
+            return View();
+        }
+
+        // Lägg till en ny Regel
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
+        public IActionResult CreateAdvRule([Bind("Id, Title, Description")] AdvRule advRule)
+        {
+            if (ModelState.IsValid)
+            {
+                // Begär att BusinessLagret lägger till den nya Regeln
+                string result = _businessLayer.CreateAdvRule(advRule);
+                if (result == "OK")
+                {
+                    return RedirectToAction("IndexAdmin");
+                }
+                else
+                {
+                    AddError(result);
+                    return View(advRule);
+                }
+            }
+
+            return View(advRule);
+        }
+
         // Lägg in ny utrustning till en annons      
         public IActionResult CreateEquipment(int advId)
         {
@@ -205,37 +236,6 @@ namespace ExArbeteJonas.Controllers
             return View(viewModel);
         }
 
-        // Lägg till en ny Regel
-        [Authorize(Roles = "Admin")]
-        public IActionResult CreateAdvRule()
-        {
-            return View();
-        }
-
-        // Lägg till en ny Regel
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin")]
-        public IActionResult CreateAdvRule([Bind("Id, Title, Description")] AdvRule advRule)
-        {
-            if (ModelState.IsValid)
-            {
-                // Begär att BusinessLagret lägger till den nya Regeln
-                string result = _businessLayer.CreateAdvRule(advRule);
-                if (result == "OK")
-                {
-                    return RedirectToAction("IndexTypes");
-                }
-                else
-                {
-                    AddError(result);
-                    return View(advRule);
-                }
-            }
-
-            return View(advRule);
-        }
-
         // Lägg till en ny UtrustningsTyp
         [Authorize(Roles = "Admin")]
         public IActionResult CreateEquipmentType()
@@ -255,7 +255,7 @@ namespace ExArbeteJonas.Controllers
                 string result = _businessLayer.CreateEquipmentType(eqType);
                 if (result == "OK")
                 {
-                    return RedirectToAction("IndexTypes");
+                    return RedirectToAction("IndexAdmin");
                 }
                 else
                 {
@@ -558,14 +558,13 @@ namespace ExArbeteJonas.Controllers
             return View(viewModel);
         }
 
-        // Visa sidan för administration av AnnonsTyper och UtrustningsTyper 
+        // Visa sidan för administration av AnnonsTyper, UtrustningsTyper och Regler
         [Authorize(Roles = "Admin")]
-        public IActionResult IndexTypes()
+        public IActionResult IndexAdmin()
         {
-            TypesViewModel viewModel = new TypesViewModel();
+            AdminViewModel viewModel = new AdminViewModel();
             viewModel.AdTypeNames = _businessLayer.GetAdvTypeNames();
             viewModel.EquipmentTypeNames = _businessLayer.GetEquipmentTypeNames();
-
             viewModel.CurrentRules = _businessLayer.GetRules();
 
             return View(viewModel);

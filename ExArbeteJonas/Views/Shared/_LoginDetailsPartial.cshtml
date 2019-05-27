@@ -21,7 +21,7 @@
     @if (User.IsInRole("Admin"))
     {
         <li><a asp-area="" asp-controller="Account" asp-action="Index">Behörigheter</a></li>
-        <li><a asp-area="" asp-controller="Home" asp-action="IndexTypes">Adm</a></li>
+        <li><a asp-area="" asp-controller="Home" asp-action="IndexAdmin">Adm</a></li>
         <li><a asp-area="" asp-controller="Home" asp-action="CreateStatistics">Statistik</a></li>
         <li><a asp-area="" asp-controller="Account" asp-action="Edit" asp-route-id="@userManager.GetUserId(User)">Ändra mina Uppgifter</a></li>
         <li><a>@userManager.GetUserName(User) inloggad som Administratör</a></li>

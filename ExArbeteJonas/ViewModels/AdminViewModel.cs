@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ExArbeteJonas.ViewModels
 {
-    public class TypesViewModel
+    public class AdminViewModel
     {
         public List<string> AdTypeNames { get; set; }
         public List<string> EquipmentTypeNames { get; set; }
