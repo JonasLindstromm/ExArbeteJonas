@@ -17,10 +17,10 @@ namespace ExArbeteJonas.BusinessLayer
 {
     public class MarketBusiness : IMarketBusiness
     {
-        private readonly Microsoft.AspNetCore.Identity.UserManager<ApplicationUser> _userManager;
         private IMarketData _marketData;
         private IHostingEnvironment _environment;
         private readonly IConfiguration _config;
+        private readonly Microsoft.AspNetCore.Identity.UserManager<ApplicationUser> _userManager;
 
         //Dependency Injection via konstruktorn
         public MarketBusiness(IMarketData marketData, IHostingEnvironment environment, IConfiguration config, UserManager<ApplicationUser> userManager)
@@ -436,6 +436,19 @@ namespace ExArbeteJonas.BusinessLayer
         // Spara en bild som annonsören har laddat upp
         public string SaveImage(IFormFile imageFile)
         {
+            var uniqueFileName = GetUniqueFileName(imageFile.FileName);
+            var uploads = Path.Combine(_environment.WebRootPath, "Uploads");
+            var filePath = Path.Combine(uploads, uniqueFileName);
+            imageFile.CopyTo(new FileStream(filePath, FileMode.Create));
+
+            return uniqueFileName;
+        }
+
+        // Uppdatera en bild som annonsören har laddat upp
+        public string UpdateImage(IFormFile imageFile, string oldImageFileName)
+        {
+            // Delete the old Image File
+            DeleteImage(oldImageFileName);
 
             var uniqueFileName = GetUniqueFileName(imageFile.FileName);
             var uploads = Path.Combine(_environment.WebRootPath, "Uploads");
@@ -592,7 +605,6 @@ namespace ExArbeteJonas.BusinessLayer
             return sum / counter;
         }
 
-
         // Skapa ett unikt Filnamn
         private string GetUniqueFileName(string fileName)
         {
@@ -622,13 +634,7 @@ namespace ExArbeteJonas.BusinessLayer
             remAdv.ImageFileName = "";
 
             // Delete the Image File
-            var uploads = Path.Combine(_environment.WebRootPath, "Uploads");
-            var filePath = Path.Combine(uploads, adv.ImageFileName);
-            if (File.Exists(filePath))
-            {
-                File.Delete(filePath);
-            }
-
+            DeleteImage(adv.ImageFileName);
 
             _marketData.CreateRemovedAdv(remAdv);
 
@@ -636,6 +642,20 @@ namespace ExArbeteJonas.BusinessLayer
             foreach (var eqm in Equipments)
             {
                 CopyToRemovedEqm(eqm, remAdv.Id);
+            }
+        }
+
+        // Delete an uploaded Image file
+        private void DeleteImage(string imageFileName)
+        {
+            if (imageFileName != null)
+            {
+                var uploads = Path.Combine(_environment.WebRootPath, "Uploads");
+                var filePath = Path.Combine(uploads, imageFileName);
+                if (File.Exists(filePath))
+                {
+                    File.Delete(filePath);
+                }
             }
         }
 

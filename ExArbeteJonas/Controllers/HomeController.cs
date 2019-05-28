@@ -171,7 +171,8 @@ namespace ExArbeteJonas.Controllers
             return View(advRule);
         }
 
-        // Lägg in ny utrustning till en annons      
+        // Lägg in ny utrustning till en annons     
+        [Authorize(Roles = "Member")]
         public IActionResult CreateEquipment(int advId)
         {
             CreateEqViewModel viewModel = new CreateEqViewModel();
@@ -314,10 +315,10 @@ namespace ExArbeteJonas.Controllers
                     statvM.Statistics = _businessLayer.GetAgeDeletedAdsStatistics(eqTypeNames, adTypeNames);
                     return PartialView("_StatisticsAgeAdsPartial", statvM);
             }
-           
+
         }
 
-        // Ta bort en egen annons
+        // Ta bort en annons
         [Authorize(Roles = "Admin")]
         public IActionResult DeleteAdv(int? id)
         {
@@ -333,11 +334,20 @@ namespace ExArbeteJonas.Controllers
             {
                 return NotFound();
             }
+            
+            AdvDetailsViewModel viewModel = new AdvDetailsViewModel();
+            viewModel.AdvId = (int)id;
+            viewModel.AdvType = adv.AdvType;
+            viewModel.Member = adv.Member;
+            viewModel.Title = adv.Title;
+            viewModel.Description = adv.Description;
+            viewModel.Price = adv.Price;
+            viewModel.Place = adv.Place;
+            viewModel.StartDate = adv.StartDate;
+            viewModel.ImageFileName = adv.ImageFileName;
+            viewModel.Equipments = _businessLayer.GetEquipment((int)(id));
 
-            // Begär att BusinessLagret tar bort annonsen
-            _businessLayer.DeleteAdv(adv);
-
-            return RedirectToAction("IndexAds");
+            return View(viewModel);
         }
 
         // Ta bort en egen annons
@@ -361,14 +371,42 @@ namespace ExArbeteJonas.Controllers
 
             // Medlemmar ska bara kunna ta bort sina egna annonser
             if (adv.MemberId == user.Id)
-            {
-                // Begär att BusinessLagret tar bort annonsen
-                _businessLayer.DeleteAdv(adv);
+            {                
+                AdvDetailsViewModel viewModel = new AdvDetailsViewModel();
+                viewModel.AdvId = (int)id;
+                viewModel.AdvType = adv.AdvType;
+                viewModel.Member = adv.Member;
+                viewModel.Title = adv.Title;
+                viewModel.Description = adv.Description;
+                viewModel.Price = adv.Price;
+                viewModel.Place = adv.Place;
+                viewModel.StartDate = adv.StartDate;
+                viewModel.ImageFileName = adv.ImageFileName;
+                viewModel.Equipments = _businessLayer.GetEquipment((int)(id));
+
+                return View("DeleteAdv", viewModel);
             }
 
             return RedirectToAction("IndexOwnAds");
         }
 
+        [HttpPost, ActionName("DeleteAdv")]
+        [ValidateAntiForgeryToken]
+        [Authorize]
+        public IActionResult DeleteConfirmed(AdvDetailsViewModel viewModel)
+        {
+            // Begär att BusinessLagret hämtar en specifik annons
+            Advertisement adv = _businessLayer.GetAdv(viewModel.AdvId);
+
+            if (adv == null)
+            {
+                return NotFound();
+            }
+
+            // Begär att BusinessLagret tar bort annonsen
+            _businessLayer.DeleteAdv(adv);
+            return RedirectToAction("IndexAds");
+        }
 
         // Ta bort en regel för annonsering
         [Authorize(Roles = "Admin")]
@@ -432,7 +470,7 @@ namespace ExArbeteJonas.Controllers
             return PartialView("_DetailsAdvRulePartial", advRule);
         }
 
-        // Uppdatera annons
+        // Uppdatera egen annons
         [Authorize(Roles = "Member")]
         public IActionResult EditAdv(int? id)
         {
@@ -460,7 +498,7 @@ namespace ExArbeteJonas.Controllers
             return View(viewModel);
         }
 
-        // Uppdatera annons
+        // Uppdatera egen annons
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Member")]
@@ -480,15 +518,25 @@ namespace ExArbeteJonas.Controllers
                 {
                     if (imageFile.Length > 0)
                     {
-                        viewModel.CurrentAdv.ImageFileName = _businessLayer.SaveImage(imageFile);
+                        viewModel.CurrentAdv.ImageFileName = _businessLayer.UpdateImage(imageFile, viewModel.CurrentAdv.ImageFileName);
                     }
                 }
 
                 // Begär att BusinessLagret uppdaterar annonsen
                 string result = _businessLayer.UpdateAdv(viewModel.CurrentAdv);
+
                 if (result == "OK")
                 {
-                    return RedirectToAction("IndexOwnAds");
+                    // Om annonsen innehåller mindre än 2 Utrustningar
+                    if (_businessLayer.GetEquipment(viewModel.CurrentAdv.Id).Count() < 2)
+                    {
+                        // Ge Medlemmen möjlighet att lägga till ytterligare utrustning till annonsen            
+                        return RedirectToAction("CreateEquipment", new { advId = viewModel.CurrentAdv.Id });
+                    }
+                    else
+                    {
+                        return RedirectToAction("IndexOwnAds");
+                    }
                 }
                 else
                 {

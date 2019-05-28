@@ -36,6 +36,7 @@ namespace ExArbeteJonas.BusinessLayer
         IDictionary<string, List<int>> GetNrAdsStatistics(List<string> eqTypeNames, List<string> adTypeNames);
         IDictionary<string, List<int>> GetNrDeletedAdsStatistics(List<string> eqTypeNames, List<string> adTypeNames);
         IDictionary<string, List<int>> GetPriceAdsStatistics(List<string> eqTypeNames, List<string> adTypeNames);
-        string SaveImage(IFormFile imageFile);        
+        string SaveImage(IFormFile imageFile);
+        string UpdateImage(IFormFile imageFile, string oldImageFileName);
     }
 }

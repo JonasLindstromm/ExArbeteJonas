@@ -58,7 +58,7 @@ namespace ExArbeteJonas.DataLayer
             return "OK";
         }
 
-        // Skapa nu utrustning till en annons
+        // Skapa en ny utrustning 
         public string CreateEqm(Equipment eqm)
         {
             _context.Add(eqm);
@@ -88,7 +88,7 @@ namespace ExArbeteJonas.DataLayer
             _context.SaveChanges();
         }
 
-        // Hämta en annons
+        // Läs en annons
         public Advertisement GetAdv(int id)
         {
             return _context.Advertisement
@@ -97,14 +97,14 @@ namespace ExArbeteJonas.DataLayer
               .SingleOrDefault(m => m.Id == id);
         }
 
-        // Hämta en regel för annonsering
+        // Läs en regel för annonsering
         public AdvRule GetAdvRule(int id)
         {           
             return _context.AdvRule              
               .SingleOrDefault(m => m.Id == id);   
         }
 
-        // Läs namnen på existerande Annonstyper
+        // Läs namnen på alla existerande Annonstyper
         public List<string> GetAdTypeNames()
         {
             // Sortera Advtypes i Namnordning
@@ -112,7 +112,7 @@ namespace ExArbeteJonas.DataLayer
             return advTypes.Select(e => e.Name).ToList();
         }
 
-        // Hämta alla Annonstyper
+        // Läs alla Annonstyper
         public List<AdType> GetAdvTypes()
         {
             // Sortera Advtypes i Namnordning
@@ -120,7 +120,7 @@ namespace ExArbeteJonas.DataLayer
             return advTypes.ToList();
         }
 
-        // Hämta alla Utrustningstyper
+        // Läs alla Utrustningstyper
         public List<EquipmentType> GetEquipmentTypes()
         {
             // Sortera Advtypes i Namnordning
@@ -128,7 +128,7 @@ namespace ExArbeteJonas.DataLayer
             return eqTypes.ToList();
         }
 
-        // Hämta alla annonser
+        // Läs alla annonser
         public List<Advertisement> GetCurrentAds()
         {
             var allAds = _context.Advertisement.Include(a => a.AdvType)
@@ -138,13 +138,13 @@ namespace ExArbeteJonas.DataLayer
             return allAds.OrderBy(p => p.StartDate).ToList();
         }
 
-        // Hämta alla Utrustningar
+        // Läs alla Utrustningar
         public List<Equipment> GetCurrentEquipments()
         {
             return _context.Equipment.Include(e => e.EqType).Include(e => e.ActualAd.AdvType).ToList();
         }
 
-        // Hämta alla borttagna annonser
+        // Läs alla borttagna annonser
         public List<RemovedAdv> GetRemovedAds()
         {
             var allAds = _context.RemovedAdv.Include(a => a.AdvType)
@@ -154,19 +154,19 @@ namespace ExArbeteJonas.DataLayer
             return allAds.OrderBy(p => p.StartDate).ToList();
         }
 
-        // Hämta alla borttagna Utrustningar
+        // Läs alla borttagna Utrustningar
         public List<RemovedEqm> GetRemovedEquipments()
         {
             return _context.RemovedEqm.Include(e => e.EqType).Include(e => e.RemovedAd.AdvType).ToList();
         }
 
-        // Hämta alla regler för Annonsering
+        // Läs alla regler för Annonsering
         public List<AdvRule> GetRules()
         {
             return _context.AdvRule.ToList();            
         }
 
-        // Hämta utrustning för en viss annons
+        // Läs utrustning för en viss annons
         public List<Equipment> GetEquipment(int advId)
         {        
             var equipment = _context.Equipment.Include(e => e.EqType)
@@ -200,7 +200,7 @@ namespace ExArbeteJonas.DataLayer
             return allAds.OrderBy(p => p.StartDate).ToList();
         }
 
-        // Svara på om en viss annons redan finns inlagd
+        // Svara på om en viss annons redan finns i databasen
         public bool IsExistingAdv(Advertisement adv)
         {
             var existingAds = _context.Advertisement.Include(a => a.AdvType).
@@ -215,6 +215,7 @@ namespace ExArbeteJonas.DataLayer
             }
         }
 
+        // Svara på om en viss utrustning redan finns i databasen
         public bool IsExistingEqm(Equipment eqm)
         {
             var existingEqms = _context.Equipment.Include(e => e.EqType).
@@ -230,6 +231,7 @@ namespace ExArbeteJonas.DataLayer
             }
         }
 
+        // Uppdatera en annons
         public string UpdateAdv(Advertisement adv)
         {           
             try
