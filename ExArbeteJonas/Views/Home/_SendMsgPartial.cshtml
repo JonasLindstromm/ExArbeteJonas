@@ -4,8 +4,8 @@
 
 <div class="container">
     <div class="row col-md-4 col-md-offset-4">
-        <div class="col">
-            <form asp-controller="Home" asp-action="SendMsg" method="post">
+        <div class="col">            
+            <form asp-action="SendMsg" asp-controller="Home" data-ajax="true" data-ajax-method="POST" data-ajax-mode="replace" data-ajax-update="#SendMsg">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <input type="hidden" asp-for="AdvId" />
                 <div class="form-group">

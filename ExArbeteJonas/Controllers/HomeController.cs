@@ -689,13 +689,14 @@ namespace ExArbeteJonas.Controllers
             {
                 _businessLayer.SendEmail(viewModel.Subject, viewModel.Message, adv.Member.Email);
 
-                return RedirectToAction("DetailsAdv", new { id = adv.Id });
+                return PartialView("_SendMsgResultPartial");
             }
 
             viewModel.AdvTitle = adv.Title;
             viewModel.AdvTypeName = adv.AdvType.Name;
             viewModel.UserName = adv.Member.UserName;
-            return View(viewModel);
+           
+            return PartialView("_SendMsgPartial", viewModel);
         }
 
         // Sök annonser       

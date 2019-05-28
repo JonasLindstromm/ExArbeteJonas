@@ -155,6 +155,7 @@ namespace ExArbeteJonas.BusinessLayer
             return _marketData.GetCurrentAds();
         }
 
+        // Läs alla Regler för annonsering
         public List<AdvRule> GetRules()
         {
             return _marketData.GetRules();
@@ -615,7 +616,7 @@ namespace ExArbeteJonas.BusinessLayer
                       + Path.GetExtension(fileName);
         }
 
-        // Save data for a Removed Advertisement 
+        // Spara data för en borttagen annons 
         private async void CopyToRemovedAdv(Advertisement adv)
         {
             ApplicationUser user = await _userManager.FindByIdAsync(adv.MemberId);
@@ -645,7 +646,7 @@ namespace ExArbeteJonas.BusinessLayer
             }
         }
 
-        // Delete an uploaded Image file
+        // Ta bort en bildfil
         private void DeleteImage(string imageFileName)
         {
             if (imageFileName != null)
@@ -659,7 +660,7 @@ namespace ExArbeteJonas.BusinessLayer
             }
         }
 
-        // Save data for a Removed equipment 
+        // Spara data för en borttagen utrustning 
         private void CopyToRemovedEqm(Equipment eqm, int remAdvId)
         {
             RemovedEqm remEqm = new RemovedEqm();
