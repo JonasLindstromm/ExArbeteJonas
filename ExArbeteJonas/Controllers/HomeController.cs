@@ -428,7 +428,7 @@ namespace ExArbeteJonas.Controllers
             // Begär att BusinessLagret tar bort regeln
             _businessLayer.DeleteAdvRule(advRule);
 
-            return RedirectToAction("IndexTypes");
+            return RedirectToAction("IndexAdmin");
         }
 
         // Visa alla detaljer i en annons

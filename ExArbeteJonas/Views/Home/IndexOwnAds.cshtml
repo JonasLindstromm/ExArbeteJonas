@@ -13,9 +13,12 @@ else
             <tr>
                 <th>
                     Annonstyp
-                </th>               
+                </th>
                 <th>
                     Annonsrubrik
+                </th>
+                <th>
+                    Plats
                 </th>
                 <th>
                     Annonsdatum
@@ -27,22 +30,25 @@ else
         <tbody>
             @foreach (var item in Model.CurrentAds)
             {
-                <tr>
-                    <td>
-                        @item.AdvType.Name
-                    </td>                    
-                    <td>
-                        @item.Title
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.StartDate)
-                    </td>
-                    <td>
-                        <a asp-action="DeleteOwnAdv" asp-route-id="@item.Id">Ta bort annonsen | </a>
-                        <a asp-action="EditAdv" asp-route-id="@item.Id">Uppdatera annonsen | </a>
-                        <a asp-action="DetailsAdv" asp-route-id="@item.Id">Visa hela annonsen</a>                        
-                    </td>
-                </tr>
+            <tr>
+                <td>
+                    @item.AdvType.Name
+                </td>
+                <td>
+                    @item.Title
+                </td>
+                <td>
+                    @item.Place
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.StartDate)
+                </td>
+                <td>
+                    <a asp-action="DeleteOwnAdv" asp-route-id="@item.Id">Ta bort annonsen | </a>
+                    <a asp-action="EditAdv" asp-route-id="@item.Id">Uppdatera annonsen | </a>
+                    <a asp-action="DetailsAdv" asp-route-id="@item.Id">Visa hela annonsen</a>
+                </td>
+            </tr>
             }
         </tbody>
     </table>
